@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Mi cuenta | PetFun{% endblock %}
+{% block content %}
+  <div class="row">
+    <div class="card grow" style="max-width:720px;margin:0 auto">
+      <h2>Mi cuenta</h2>
+
+      <!-- Perfil -->
+      <form method="post" action="{% url 'account' %}" style="margin-bottom:16px">
+        {% csrf_token %}
+        <input type="hidden" name="submit_profile" value="1" />
+        <div class="row">
+          <div class="grow">
+            <label>Email</label>
+            <input type="text" value="{{ request.user.email }}" disabled />
+          </div>
+        </div>
+        <div class="row">
+          <div class="grow">
+            <label>Nombre</label>
+            <input type="text" name="first_name" value="{{ form.first_name.value|default:request.user.first_name }}" />
+          </div>
+          <div class="grow">
+            <label>Apellidos</label>
+            <input type="text" name="last_name" value="{{ form.last_name.value|default:request.user.last_name }}" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="grow">
+            <label>Teléfono</label>
+            <input type="text" name="phone" value="{{ form.phone.value|default:request.user.phone }}" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="grow">
+            <label>Dirección</label>
+            <input type="text" name="address" value="{{ form.address.value|default:request.user.address }}" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="grow">
+            <label>Ciudad</label>
+            <input type="text" name="city" value="{{ form.city.value|default:request.user.city }}" />
+          </div>
+          <div class="grow">
+            <label>Código postal</label>
+            <input type="text" name="postal_code" value="{{ form.postal_code.value|default:request.user.postal_code }}" />
+          </div>
+        </div>
+
+        {% if form.errors %}
+          <ul class="messages">
+            {% for field, errors in form.errors.items %}
+              {% for e in errors %}<li class="error">{{ e }}</li>{% endfor %}
+            {% endfor %}
+          </ul>
+        {% endif %}
+
+        <button type="submit">Guardar cambios</button>
+      </form>
+
+      <!-- Cambiar contraseña -->
+      <div class="card" style="margin-top:16px">
+        <h3>Cambiar contraseña</h3>
+        <form method="post" action="{% url 'account' %}">
+          {% csrf_token %}
+          <input type="hidden" name="submit_password" value="1" />
+          <div class="row">
+            <div class="grow">
+              <label>Contraseña actual</label>
+              <input type="password" name="old_password" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="grow">
+              <label>Nueva contraseña</label>
+              <input type="password" name="new_password1" />
+            </div>
+            <div class="grow">
+              <label>Confirmar nueva contraseña</label>
+              <input type="password" name="new_password2" />
+            </div>
+          </div>
+
+          {% if pwd_form.errors %}
+            <ul class="messages">
+              {% for field, errors in pwd_form.errors.items %}
+                {% for e in errors %}<li class="error">{{ e }}</li>{% endfor %}
+              {% endfor %}
+            </ul>
+          {% endif %}
+
+          <button type="submit">Actualizar contraseña</button>
+        </form>
+      </div>
+
+      <!-- Eliminar cuenta (requiere contraseña) -->
+      <div class="card" style="margin-top:16px">
+        <h3>Eliminar cuenta</h3>
+        <p style="color:#9aa0a6">Esta acción es irreversible. Escribe tu contraseña para confirmar.</p>
+        <form method="post" action="{% url 'account_delete' %}">
+          {% csrf_token %}
+          <div class="row">
+            <div class="grow">
+              <label>Contraseña</label>
+              <input type="password" name="password" />
+            </div>
+          </div>
+          <button type="submit" style="background:#c44;color:white">Eliminar cuenta</button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

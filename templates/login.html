@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Iniciar sesión | PetFun{% endblock %}
+{% block content %}
+  <div class="row">
+    <div class="card grow" style="max-width:520px;margin:0 auto">
+      <h2>Iniciar sesión</h2>
+      <form method="post" action="{% url 'login' %}{% if next %}?next={{ next|urlencode }}{% endif %}">
+        {% csrf_token %}
+        <label for="id_email">Correo electrónico</label>
+        <input id="id_email" name="email" type="text" placeholder="tu@email.com" required />
+
+        <label for="id_password">Contraseña</label>
+        <input id="id_password" name="password" type="password" placeholder="••••••••" required />
+
+        {% if next %}
+          <input type="hidden" name="next" value="{{ next }}" />
+        {% endif %}
+        <button type="submit">Entrar</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}
