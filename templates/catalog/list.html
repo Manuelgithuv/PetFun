@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+{% load catalog_extras %}
+{% block content %}
+<h1>Catálogo</h1>
+
+<form method="get" class="card" style="margin:12px 0; display:flex; gap:10px; align-items:center">
+  <input type="text" name="q" placeholder="Buscar por producto, categoría o fabricante" value="{{ active_q }}" style="flex:2" />
+  <select name="manufacturer" style="flex:1">
+    <option value="">-- Fabricante --</option>
+    {% for name in manufacturers %}
+      <option value="{{ name }}" {% if active_manufacturer == name %}selected{% endif %}>{{ name }}</option>
+    {% endfor %}
+  </select>
+  {% if active_parent %}<input type="hidden" name="parent" value="{{ active_parent }}" />{% endif %}
+  {% if active_sub %}<input type="hidden" name="sub" value="{{ active_sub }}" />{% endif %}
+  <button type="submit">Buscar</button>
+  <a href="/catalog/" style="margin-left:auto">Limpiar</a>
+  </form>
+
+{% if active_parent or active_sub %}
+  <div class="card" style="margin-bottom:12px; padding:10px; display:flex; align-items:center; gap:10px">
+    <div>Filtrando:
+      {% if active_parent %}<strong>{{ active_parent }}</strong>{% endif %}
+      {% if active_sub %} / <strong>{{ active_sub }}</strong>{% endif %}
+    </div>
+    <a href="/catalog/" style="margin-left:auto">Limpiar filtros</a>
+  </div>
+{% endif %}
+
+{% for parent in categories %}
+  <section>
+    <h2>{{ parent.name }}</h2>
+    {% for sub in subcats_by_parent|get_item:parent.id %}
+      <h3>{{ sub.name }}</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;">
+      {% for p in products_by_subcat|get_item:sub.id %}
+        <div class="card" style="border:1px solid #ddd;padding:10px;border-radius:8px;">
+          <div style="font-weight:bold; display:flex; justify-content:space-between; align-items:center">
+            <span>{{ p.name }}</span>
+            {% if p.stock == 0 %}
+              <span style="color:#ff6b6b; font-weight:700">Agotado</span>
+            {% endif %}
+          </div>
+          <div>Precio: {{ p.price }} €</div>
+          <div style="display:flex; gap:8px; align-items:center; margin-top:8px">
+            <input class="qty-input" type="number" min="1" value="1" style="width:60px" {% if p.stock == 0 %}disabled{% endif %} />
+            <button class="btn-add" data-product-id="{{ p.id }}" {% if p.stock == 0 %}disabled{% endif %}>Añadir</button>
+          </div>
+        </div>
+      {% endfor %}
+      </div>
+    {% endfor %}
+  </section>
+{% endfor %}
+
+{% endblock %}
+
+{% block extra_js %}{% endblock %}

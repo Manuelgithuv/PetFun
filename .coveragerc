@@ -1,0 +1,9 @@
+[run]
+omit =
+    */migrations/*
+    */tests/*
+    */tests_pkg/*
+    */__pycache__/*
+    */wsgi.py
+    */asgi.py
+    */settings.py

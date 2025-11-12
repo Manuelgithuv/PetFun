@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Seguimiento de pedido</h1>
+<form method="post" class="card" style="margin-bottom:12px">
+  {% csrf_token %}
+  <label for="track-code">Código de seguimiento</label>
+  <input id="track-code" type="text" name="code" value="{{ code }}" placeholder="Ej: PT-202511-ABC12345" required />
+  <div style="margin-top:10px"><button type="submit">Buscar</button></div>
+</form>
+
+{% if order %}
+  <div class="card">
+    <h2>Pedido {{ order.tracking_code }}</h2>
+    <p>Estado: <strong>{{ order.get_status_display }}</strong></p>
+    <p>Total: <strong>{{ order.total }} €</strong></p>
+    <h3>Envío</h3>
+    <p>{{ order.ship_name }}<br/>
+       {{ order.ship_street }} {{ order.ship_number }} {{ order.ship_floor }}<br/>
+       {{ order.ship_city }} {{ order.ship_postal_code }} ({{ order.ship_country }})
+    </p>
+    <h3>Artículos</h3>
+    <ul>
+    {% for it in order.items.all %}
+      <li>{{ it.quantity }} x {{ it.product_name }} — {{ it.subtotal }} €</li>
+    {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+{% endblock %}

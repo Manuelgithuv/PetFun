@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Pedido confirmado</h1>
+<p>¡Gracias por tu compra! Tu código de seguimiento es:</p>
+<div class="card">
+  <h2>{{ order.tracking_code }}</h2>
+  <p>Total: <strong>{{ order.total }} €</strong></p>
+  <p>Estado: {{ order.get_status_display }}</p>
+</div>
+<p><a href="/catalog/">Volver al catálogo</a></p>
+{% endblock %}

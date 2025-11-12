@@ -6,7 +6,11 @@
       <div class="grow" style="min-width:280px">
         <h1 style="margin:0 0 10px 0">Todo para tus mascotas</h1>
         <p style="color:#c7c9cc; margin:0 0 16px 0">Camas, juguetes, alimentación y accesorios premium a un clic.</p>
-        <a href="#productos"><button>Ver productos destacados</button></a>
+        <form action="/catalog/" method="get" style="display:flex; gap:8px; margin:0 0 12px 0">
+          <input type="text" name="q" placeholder="Buscar productos..." style="flex:1" />
+          <button type="submit">Buscar</button>
+        </form>
+        <a href="/catalog/"><button>Ver productos</button></a>
       </div>
       <div class="grow" style="text-align:right">
         <img src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=900&q=80&auto=format&fit=crop" alt="Mascotas felices" style="max-width:420px;width:100%;border-radius:12px;border:1px solid rgba(255,255,255,.12)"/>
@@ -14,25 +18,37 @@
     </div>
   </section>
 
-  <section class="row" style="margin-top:20px">
-    <div class="card grow"><strong>Perros</strong><p style="color:#9aa0a6">Alimentos, correas, camas y más</p></div>
-    <div class="card grow"><strong>Gatos</strong><p style="color:#9aa0a6">Rascadores, areneros, juguetes</p></div>
-    <div class="card grow"><strong>Accesorios</strong><p style="color:#9aa0a6">Fuentes, comederos, tech</p></div>
+  {% if subcats_by_parent %}
+  <section class="row" style="margin-top:20px; gap:12px; flex-wrap:wrap">
+    {% for parent_name, subs in subcats_by_parent.items %}
+      <a class="card" href="/catalog/?parent={{ parent_name|urlencode }}" style="display:block;color:inherit;flex:1 1 260px;max-width:340px">
+        <strong>{{ parent_name }}</strong>
+        <p style="color:#9aa0a6; margin:6px 0">Explora por subcategoría:</p>
+        <div style="display:flex; gap:6px; flex-wrap:wrap">
+          {% for sub in subs|slice:':4' %}
+            <a href="/catalog/?parent={{ parent_name|urlencode }}&sub={{ sub|urlencode }}" style="font-size:12px; padding:4px 8px; background:#f1f3f4; border-radius:999px; color:#202124; text-decoration:none">{{ sub }}</a>
+          {% endfor %}
+        </div>
+      </a>
+    {% endfor %}
   </section>
+  {% endif %}
 
   <h2 id="productos" style="margin-top:28px">Productos destacados</h2>
   <section class="row">
     {% for p in products %}
       <article class="card" style="flex:1 1 260px;max-width:300px">
-        <img src="{{ p.image }}" alt="{{ p.name }}" style="width:100%;height:180px;object-fit:cover;border-radius:8px;margin-bottom:10px"/>
+        <img src="{{ p.image_url|default:'https://placehold.co/600x400?text=Producto' }}" alt="{{ p.name }}" style="width:100%;height:180px;object-fit:cover;border-radius:8px;margin-bottom:10px"/>
         <div style="display:flex;justify-content:space-between;align-items:center">
           <div>
-            <div style="font-weight:600">{{ p.name }}</div>
+            <div style="font-weight:600">{{ p.name }} {% if p.stock == 0 %}<span style="color:#ff6b6b;font-weight:700">· Agotado</span>{% endif %}</div>
             <div style="color:#9aa0a6">{{ p.price }} €</div>
           </div>
-          <button type="button">Añadir</button>
+          <button type="button" class="btn-add" data-product-id="{{ p.id }}" {% if p.stock == 0 %}disabled{% endif %}>Añadir</button>
         </div>
       </article>
     {% endfor %}
   </section>
 {% endblock %}
+
+{% block extra_js %}{% endblock %}
