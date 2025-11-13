@@ -10,8 +10,16 @@ def _seed_catalog_if_empty(sender, **kwargs):
     try:
         from decimal import Decimal
         from catalog.models import Category, Manufacturer, Product
+        import re
 
+        # If products already exist, upgrade simple placeholder images to descriptive ones
         if Product.objects.exists():
+            for p in Product.objects.all():
+                if p.image_url and re.fullmatch(r"https://placehold\.co/600x400\?text=[A-Z0-9\-]+", p.image_url):
+                    new_url = f"https://placehold.co/600x400?text={p.sku}+{p.name.replace(' ', '+')}"
+                    if p.image_url != new_url:
+                        p.image_url = new_url
+                        p.save(update_fields=["image_url"])
             return
 
         # Categories
@@ -66,7 +74,7 @@ def _seed_catalog_if_empty(sender, **kwargs):
                     stock=stock,
                     category=cat,
                     manufacturer=mfr_map.get(mfr_name),
-                    image_url=f"https://placehold.co/600x400?text={sku}",
+                    image_url=f"https://placehold.co/600x400?text={sku}+{name.replace(' ', '+')}",
                 )
             )
 
@@ -102,7 +110,7 @@ def _seed_catalog_if_empty(sender, **kwargs):
                     stock=stock,
                     category=cat,
                     manufacturer=mfr,
-                    image_url=f"https://placehold.co/600x400?text={sku}",
+                    image_url=f"https://placehold.co/600x400?text={sku}+{name.replace(' ', '+')}",
                 )
             )
     except Exception:

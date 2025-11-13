@@ -150,6 +150,12 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
+# Serve product images from local Images/ folder via staticfiles
+# e.g., an image named DOG-MOR-001.jpg will be available at /static/DOG-MOR-001.jpg
+STATICFILES_DIRS = [
+    BASE_DIR / "Images",
+]
+
 # Where to redirect after login/logout (can be overridden per-view)
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/"

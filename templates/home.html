@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load catalog_extras %}
 {% block title %}Inicio | PetFun{% endblock %}
 {% block content %}
   <section class="card" style="padding:24px; background:linear-gradient(135deg,#1c2541,#0b132b 70%); border-color:rgba(255,255,255,.12)">
@@ -38,7 +39,7 @@
   <section class="row">
     {% for p in products %}
       <article class="card" style="flex:1 1 260px;max-width:300px">
-        <img src="{{ p.image_url|default:'https://placehold.co/600x400?text=Producto' }}" alt="{{ p.name }}" style="width:100%;height:180px;object-fit:cover;border-radius:8px;margin-bottom:10px"/>
+        <img src="{% product_image_src p %}" alt="{{ p.name }}" style="width:100%;height:180px;object-fit:cover;border-radius:8px;margin-bottom:10px"/>
         <div style="display:flex;justify-content:space-between;align-items:center">
           <div>
             <div style="font-weight:600">{{ p.name }} {% if p.stock == 0 %}<span style="color:#ff6b6b;font-weight:700">· Agotado</span>{% endif %}</div>
