@@ -2,38 +2,97 @@
 {% load catalog_extras %}
 {% block title %}Inicio | PetFun{% endblock %}
 {% block content %}
-  <section class="card" style="padding:24px; background:linear-gradient(135deg,#1c2541,#0b132b 70%); border-color:rgba(255,255,255,.12)">
-    <div class="row" style="align-items:center">
-      <div class="grow" style="min-width:280px">
-        <h1 style="margin:0 0 10px 0">Todo para tus mascotas</h1>
-        <p style="color:#c7c9cc; margin:0 0 16px 0">Camas, juguetes, alimentación y accesorios premium a un clic.</p>
-        <form action="/catalog/" method="get" style="display:flex; gap:8px; margin:0 0 12px 0">
-          <input type="text" name="q" placeholder="Buscar productos..." style="flex:1" />
-          <button type="submit">Buscar</button>
-        </form>
-        <a href="/catalog/"><button>Ver productos</button></a>
-      </div>
-      <div class="grow" style="text-align:right">
-        <img src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=900&q=80&auto=format&fit=crop" alt="Mascotas felices" style="max-width:420px;width:100%;border-radius:12px;border:1px solid rgba(255,255,255,.12)"/>
-      </div>
-    </div>
-  </section>
+<section class="card" 
+         style="padding:32px; background:white; border-color:#e5e7eb; box-shadow:0 4px 14px rgba(0,0,0,0.06); border-radius:14px;">
+  
+  <div class="row" style="align-items:center; gap:24px; flex-wrap:wrap;">
 
-  {% if subcats_by_parent %}
-  <section class="row" style="margin-top:20px; gap:12px; flex-wrap:wrap">
-    {% for parent_name, subs in subcats_by_parent.items %}
-      <a class="card" href="/catalog/?parent={{ parent_name|urlencode }}" style="display:block;color:inherit;flex:1 1 260px;max-width:340px">
-        <strong>{{ parent_name }}</strong>
-        <p style="color:#9aa0a6; margin:6px 0">Explora por subcategoría:</p>
-        <div style="display:flex; gap:6px; flex-wrap:wrap">
-          {% for sub in subs|slice:':4' %}
-            <a href="/catalog/?parent={{ parent_name|urlencode }}&sub={{ sub|urlencode }}" style="font-size:12px; padding:4px 8px; background:#f1f3f4; border-radius:999px; color:#202124; text-decoration:none">{{ sub }}</a>
-          {% endfor %}
-        </div>
+    <div class="grow" style="min-width:300px">
+      <h1 style="margin:0 0 12px 0; font-size:32px; font-weight:700; color:#111;">
+        Todo para tus mascotas
+      </h1>
+
+      <p style="color:#555; margin:0 0 20px 0; font-size:16px;">
+        Camas, juguetes, alimentación y accesorios premium a un clic.
+      </p>
+
+      <form action="/catalog/" method="get" style="display:flex; gap:10px; margin-bottom:18px;">
+        <input type="text" 
+               name="q" 
+               placeholder="Buscar productos..." 
+               style="flex:1; padding:12px 14px; border-radius:10px; border:1px solid #d1d5db; font-size:15px;">
+        
+        <button type="submit" 
+                style="padding:12px 20px; border-radius:10px; background:#f9a825; color:white; font-weight:600; border:0;">
+          Buscar
+        </button>
+      </form>
+
+      <a href="/catalog/" style="text-decoration:none;">
+        <button style="padding:12px 20px; border-radius:10px; background:#111; color:white; font-weight:600; border:0;">
+          Ver productos
+        </button>
       </a>
-    {% endfor %}
-  </section>
-  {% endif %}
+    </div>
+
+    <div class="grow" style="text-align:right; min-width:260px;">
+      <img src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=900&q=80&auto=format&fit=crop"
+           alt="Mascotas felices"
+           style="max-width:430px; width:100%; border-radius:14px; border:1px solid #e5e7eb; box-shadow:0 6px 18px rgba(0,0,0,0.08);">
+    </div>
+
+  </div>
+</section>
+
+
+ {% if subcats_by_parent %}
+<section style="margin-top:32px">
+  <h2 style="margin-bottom:16px; font-size:26px; font-weight:700;">Juguetes destacados</h2>
+
+  <div class="row" style="gap:20px; flex-wrap:wrap">
+
+{% for parent_name, subs in subcats_by_parent.items %}
+
+  <div class="card"
+       style="flex:1 1 420px; max-width:500px; padding:32px; border-radius:18px; box-shadow:0 6px 16px rgba(0,0,0,0.06); transition:0.2s ease">
+    
+    <div style="display:flex; align-items:center; gap:18px; margin-bottom:14px;">
+      <div style="width:90px; height:90px; border-radius:14px; overflow:hidden; background:#fafafa;">
+        {% if "Perro" in parent_name %}
+          <img src="https://images.unsplash.com/photo-1507146426996-ef05306b995a?q=80&w=400"
+               style="width:100%;height:100%;object-fit:cover;">
+        {% else %}
+          <img src="https://images.unsplash.com/photo-1518791841217-8f162f1e1131?q=80&w=400"
+               style="width:100%;height:100%;object-fit:cover;">
+        {% endif %}
+      </div>
+
+      <strong style="font-size:26px; font-weight:700;">
+        <a href="/catalog/?parent={{ parent_name|urlencode }}" style="text-decoration:none; color:inherit;">
+          {{ parent_name }}
+        </a>
+      </strong>
+    </div>
+
+    <p style="color:#555; margin:0 0 25px 0; font-size:15px;">
+      Explora subcategorías populares:
+    </p>
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      {% for sub in subs %}
+        <a href="/catalog/?parent={{ parent_name|urlencode }}&sub={{ sub|urlencode }}"
+           style="background:#f3f4f6; padding:8px 14px; border-radius:25px; font-size:14px; color:#333;">
+          {{ sub }}
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+
 
   <h2 id="productos" style="margin-top:28px">Productos destacados</h2>
   <section class="row">

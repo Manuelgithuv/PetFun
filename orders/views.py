@@ -62,10 +62,21 @@ def checkout_payment(request):
 			payment_intent_id = intent.id
 		else:
 			messages.error(request, "Stripe no está configurado. Añade STRIPE_SECRET_KEY y STRIPE_PUBLISHABLE_KEY en .env para pagar con tarjeta.")
+			# Aunque Stripe no esté configurado, devolvemos el formulario prellenado
+			initial = {
+				'email': email,
+				'ship_name': ship.get('name',''),
+				'ship_street': ship.get('street',''),
+				'ship_number': ship.get('number',''),
+				'ship_floor': ship.get('floor',''),
+				'ship_city': ship.get('city',''),
+				'ship_postal_code': ship.get('postal_code',''),
+				'ship_country': ship.get('country',''),
+			}
 			return render(request, 'orders/checkout_payment.html', {
 				'cart': cart,
 				'STRIPE_PUBLISHABLE_KEY': settings.STRIPE_PUBLISHABLE_KEY,
-				'initial': {},
+				'initial': initial,
 			})
 
 		# Persist checkout data in session for the confirm step
@@ -74,16 +85,42 @@ def checkout_payment(request):
 		request.session['checkout_payment_method'] = payment_method
 		request.session['payment_intent_id'] = payment_intent_id
 
+		# Prellenado para mostrar datos persistidos mientras se ingresa tarjeta
+		initial = {
+			'email': email,
+			'ship_name': ship.get('name',''),
+			'ship_street': ship.get('street',''),
+			'ship_number': ship.get('number',''),
+			'ship_floor': ship.get('floor',''),
+			'ship_city': ship.get('city',''),
+			'ship_postal_code': ship.get('postal_code',''),
+			'ship_country': ship.get('country',''),
+		}
+
 		# Render the payment element to collect card details
 		return render(request, 'orders/checkout_payment.html', {
 			'cart': cart,
 			'STRIPE_PUBLISHABLE_KEY': settings.STRIPE_PUBLISHABLE_KEY,
-			'initial': {},
+			'initial': initial,
 			'stripe_client_secret': client_secret,
 			'stripe_return_url': request.build_absolute_uri(reverse('orders:checkout_confirm')),
 		})
 	initial = {}
-	if request.user.is_authenticated:
+	# Si ya hay datos en sesión (usuario volvió a la página), usarlos primero
+	session_email = request.session.get('checkout_email')
+	session_ship = request.session.get('checkout_ship') or {}
+	if session_email and session_ship:
+		initial = {
+			'email': session_email,
+			'ship_name': session_ship.get('name',''),
+			'ship_street': session_ship.get('street',''),
+			'ship_number': session_ship.get('number',''),
+			'ship_floor': session_ship.get('floor',''),
+			'ship_city': session_ship.get('city',''),
+			'ship_postal_code': session_ship.get('postal_code',''),
+			'ship_country': session_ship.get('country',''),
+		}
+	elif request.user.is_authenticated:
 		u = request.user
 		full_name = f"{getattr(u, 'first_name', '')} {getattr(u, 'last_name', '')}".strip()
 		initial = {
