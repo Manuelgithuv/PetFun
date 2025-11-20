@@ -17,9 +17,16 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import include, path
+from django.conf import settings
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
     path("", include("core.urls")),
     path("", include("accounts.urls")),
+    path("catalog/", include("catalog.urls")),
+    path("cart/", include("cart.urls")),
+    path("", include("orders.urls")),
 ]
+
+# Admin only in development
+if settings.DEBUG:
+    urlpatterns.insert(0, path("admin/", admin.site.urls))

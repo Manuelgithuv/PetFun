@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Carrito</h1>
+<p>Revisa tu cesta y continúa al pago.</p>
+<a class="button" href="{% url 'orders:checkout_payment' %}">Continuar</a>
+{% endblock %}

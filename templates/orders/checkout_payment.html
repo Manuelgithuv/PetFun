@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Entrega y pago</h1>
+<form method="post" class="card" id="checkout-form">
+  {% csrf_token %}
+  <div class="row">
+    <div class="grow">
+      <h3>Datos de contacto</h3>
+  <label>Email</label>
+  <input type="text" name="email" required value="{{ initial.email|default:'' }}" />
+
+      <h3>Dirección de envío</h3>
+  <label>Nombre</label>
+  <input type="text" name="ship_name" required value="{{ initial.ship_name|default:'' }}" />
+      <label>Calle</label>
+  <input type="text" name="ship_street" required value="{{ initial.ship_street|default:'' }}" />
+      <label>Número</label>
+  <input type="text" name="ship_number" required value="{{ initial.ship_number|default:'' }}" />
+      <label>Piso</label>
+  <input type="text" name="ship_floor" value="{{ initial.ship_floor|default:'' }}" />
+      <label>Ciudad</label>
+  <input type="text" name="ship_city" required value="{{ initial.ship_city|default:'' }}" />
+      <label>Código Postal</label>
+  <input type="text" name="ship_postal_code" required value="{{ initial.ship_postal_code|default:'' }}" />
+      <label>País</label>
+  <input type="text" name="ship_country" required value="{{ initial.ship_country|default:'' }}" />
+    </div>
+  </div>
+  <div class="row" style="margin-top:12px">
+    <div class="grow">
+      <h3>Método de pago</h3>
+      <p>Tarjeta (Stripe)</p>
+      {% if not STRIPE_PUBLISHABLE_KEY %}
+        <p style="color:#f7bfa0">Claves de Stripe no configuradas. Añade STRIPE_SECRET_KEY y STRIPE_PUBLISHABLE_KEY en .env para poder pagar.</p>
+      {% endif %}
+    </div>
+  </div>
+  {% if stripe_client_secret %}
+    <div class="row" style="margin-top:12px">
+      <div class="grow">
+        <h3>Datos de tarjeta</h3>
+        <div id="payment-element" style="padding:12px;border-radius:8px;background:rgba(255,255,255,.06);"></div>
+      </div>
+    </div>
+    <div style="margin-top:12px">
+      <button type="button" id="btn-pay">Pagar ahora</button>
+      <p style="opacity:.7;margin-top:6px">Introducirás una tarjeta de prueba. Te redirigiremos para confirmar si es necesario.</p>
+    </div>
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+      const stripe = Stripe("{{ STRIPE_PUBLISHABLE_KEY }}");
+      const options = { clientSecret: "{{ stripe_client_secret }}" };
+      const elements = stripe.elements(options);
+      const paymentElement = elements.create('payment');
+      paymentElement.mount('#payment-element');
+
+      document.getElementById('btn-pay').addEventListener('click', async () => {
+        document.getElementById('btn-pay').disabled = true;
+        const {error} = await stripe.confirmPayment({
+          elements,
+          confirmParams: {
+            return_url: "{{ stripe_return_url }}",
+          }
+        });
+        if(error){
+          alert(error.message || 'Error al confirmar el pago');
+          document.getElementById('btn-pay').disabled = false;
+        }
+      });
+    </script>
+  {% else %}
+    <div style="margin-top:12px">
+      <button type="submit">Proceder al pago</button>
+    </div>
+    <p style="opacity:.7;margin-top:6px">Se creará un Payment Intent de Stripe y, a continuación, podrás introducir la tarjeta.</p>
+  {% endif %}
+  </form>
+{% endblock %}

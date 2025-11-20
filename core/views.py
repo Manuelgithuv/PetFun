@@ -4,44 +4,20 @@ from django.conf import settings
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
+from catalog.models import Product, Category
 
 
 @require_http_methods(["GET"])
 def home(request):
-	"""Attractive storefront homepage with featured products."""
-	products = [
-		{
-			"name": "Cama Ortopédica",
-			"price": 39.99,
-			"image": "https://images.unsplash.com/photo-1601758064135-0c3b3f2c9b74?w=800&q=80&auto=format&fit=crop",
-		},
-		{
-			"name": "Juguete Mordedor",
-			"price": 9.49,
-			"image": "https://images.unsplash.com/photo-1593134257782-e89567b7718d?w=800&q=80&auto=format&fit=crop",
-		},
-		{
-			"name": "Rascador Deluxe",
-			"price": 54.90,
-			"image": "https://images.unsplash.com/photo-1555169062-013468b47731?w=800&q=80&auto=format&fit=crop",
-		},
-		{
-			"name": "Comedero Inteligente",
-			"price": 79.00,
-			"image": "https://images.unsplash.com/photo-1596495578065-6d1e3b2c9b65?w=800&q=80&auto=format&fit=crop",
-		},
-		{
-			"name": "Arnés Reflectante",
-			"price": 18.75,
-			"image": "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=800&q=80&auto=format&fit=crop",
-		},
-		{
-			"name": "Fuente de Agua",
-			"price": 29.95,
-			"image": "https://images.unsplash.com/photo-1568640347023-a616a30bc3bd?w=800&q=80&auto=format&fit=crop",
-		},
-	]
-	return render(request, "home.html", {"products": products})
+	"""Home con productos destacados y subcategorías navegables."""
+	qs = Product.objects.order_by("-created_at").all()[:6]
+	products = list(qs)
+	parents = Category.objects.filter(parent__isnull=True).order_by('name')
+	subcats_by_parent = {}
+	for p in parents:
+		subs = Category.objects.filter(parent=p).order_by('name')
+		subcats_by_parent[p.name] = list(subs.values_list('name', flat=True))
+	return render(request, "home.html", {"products": products, "subcats_by_parent": subcats_by_parent})
 
 
 @require_http_methods(["GET", "POST"])
@@ -79,3 +55,5 @@ def logout_view(request):
 		logout(request)
 		messages.success(request, "Has cerrado sesión.")
 	return redirect("home")
+
+

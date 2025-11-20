@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% load static %}
+{% load catalog_extras %}
+{% block content %}
+<style>
+  /* Estilos locales solo para este listado */
+  .product-card .actions{display:flex;gap:10px;align-items:center;margin-top:8px}
+  .product-card .qty-input{width:72px;height:42px;border-radius:10px;border:2px solid rgba(0,0,0,.55);background:rgba(255,255,255,.06);color:var(--text);padding:8px 10px;outline:none;transition:border-color .15s ease}
+  .product-card .qty-input:hover{border-color:rgba(0,0,0,.7)}
+  .product-card .qty-input:focus{border-color:rgba(0,0,0,.85)}
+  .product-card .btn-add{flex:1;padding:12px 18px;background:#f9a825;color:#06141b;border:0;border-radius:10px;font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,.25);cursor:pointer;transition:transform .08s ease, box-shadow .2s ease, background .2s ease}
+  .product-card .btn-add:hover{background:#ffbf3f;box-shadow:0 4px 10px rgba(0,0,0,.3);transform:translateY(-1px)}
+  .product-card .btn-add:disabled{opacity:.55;cursor:not-allowed;transform:none}
+  @media (hover:none){.product-card .btn-add{transform:none}}
+  .product-card img{border-radius:8px}
+  .product-card .title-row{font-weight:bold;display:flex;justify-content:space-between;align-items:center}
+  .product-card .soldout{color:#ff6b6b;font-weight:700}
+  .product-card{border:1px solid #ddd;padding:10px;border-radius:12px}
+  .catalog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem}
+  
+</style>
+<h1>Catálogo</h1>
+
+<form method="get" class="card" 
+      style="margin:12px 0; display:flex; gap:10px; align-items:center; padding:12px;">
+
+  <input type="text" 
+         name="q" 
+         placeholder="Buscar por producto, categoría o fabricante" 
+         value="{{ active_q }}" 
+         style="flex:2; padding:10px; border-radius:8px; border:1px solid #d1d5db;" />
+
+  <div style="position:relative; flex:1;">
+    <select name="manufacturer"
+            style="
+              width:100%;
+              padding:12px 14px;
+              border-radius:8px;
+              border:1px solid #d1d5db;
+              background:white;
+              font-size:15px;
+              appearance:none;
+              -webkit-appearance:none;
+              -moz-appearance:none;
+              cursor:pointer;
+            ">
+      <option value="">Fabricante</option>
+      {% for name in manufacturers %}
+        <option value="{{ name }}" 
+                {% if active_manufacturer == name %}selected{% endif %}>
+          {{ name }}
+        </option>
+      {% endfor %}
+    </select>
+
+    <span style="
+      position:absolute;
+      right:12px;
+      top:50%;
+      transform:translateY(-50%);
+      pointer-events:none;
+      font-size:18px;
+      color:#555;
+    ">▼</span>
+  </div>
+
+  {% if active_parent %}
+    <input type="hidden" name="parent" value="{{ active_parent }}" />
+  {% endif %}
+  {% if active_sub %}
+    <input type="hidden" name="sub" value="{{ active_sub }}" />
+  {% endif %}
+
+  <button type="submit"
+          style="
+            padding:10px 18px;
+            background:#f9a825;
+            color:white;
+            border:0;
+            border-radius:8px;
+            font-weight:600;
+            box-shadow:0 2px 4px rgba(0,0,0,0.2);
+            cursor:pointer;
+            transition:0.2s;
+          "
+          onmouseover="this.style.background='#ffbf3f'"
+          onmouseout="this.style.background='#f9a825'">
+    Buscar
+  </button>
+
+  <a href="/catalog/" 
+     style="margin-left:auto; font-size:14px; color:#555; text-decoration:underline;">
+    Limpiar
+  </a>
+
+</form>
+
+
+{% if active_parent or active_sub %}
+  <div class="card" style="margin-bottom:12px; padding:10px; display:flex; align-items:center; gap:10px">
+    <div>Filtrando:
+      {% if active_parent %}<strong>{{ active_parent }}</strong>{% endif %}
+      {% if active_sub %} / <strong>{{ active_sub }}</strong>{% endif %}
+    </div>
+    <a href="/catalog/" style="margin-left:auto">Limpiar filtros</a>
+  </div>
+{% endif %}
+
+{% for parent in categories %}
+  <section>
+    <h2>{{ parent.name }}</h2>
+    {% for sub in subcats_by_parent|get_item:parent.id %}
+      <h3>{{ sub.name }}</h3>
+      <div class="catalog-grid">
+      {% for p in products_by_subcat|get_item:sub.id %}
+        <div class="card product-card">
+          <img src="{% product_image_src p %}" alt="{{ p.name }}" style="width:100%;height:160px;object-fit:cover;border-radius:6px;margin-bottom:8px" />
+          <div class="title-row">
+            <span>{{ p.name }}</span>
+            {% if p.stock == 0 %}
+              <span class="soldout">Agotado</span>
+            {% endif %}
+          </div>
+          <div class="price">Precio: {{ p.price }} €</div>
+          <div class="actions">
+            <input class="qty-input" type="number" min="1" value="1" {% if p.stock == 0 %}disabled{% endif %} />
+            <button type="button" class="btn-add" data-product-id="{{ p.id }}" {% if p.stock == 0 %}disabled{% endif %}>Añadir</button>
+          </div>
+        </div>
+      {% endfor %}
+      </div>
+    {% endfor %}
+  </section>
+{% endfor %}
+
+{% endblock %}
+
+{% block extra_js %}{% endblock %}
+

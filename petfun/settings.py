@@ -11,21 +11,45 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from .env if present
+env_path = BASE_DIR / ".env"
+try:
+    from dotenv import load_dotenv  # type: ignore
+    load_dotenv(env_path)
+except Exception:
+    # Fallback: naive parser if python-dotenv is not installed
+    if env_path.exists():
+        try:
+            for line in env_path.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                if "=" not in line:
+                    continue
+                key, val = line.split("=", 1)
+                key = key.strip()
+                val = val.strip().strip('"').strip("'")
+                if key and key not in os.environ:
+                    os.environ[key] = val
+        except Exception:
+            pass
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-n=kqsi#3wc62+o+7y5&*zf^5+*$#5tg5&z4fhtu9=e%!bw5izz"
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-n=kqsi#3wc62+o+7y5&*zf^5+*$#5tg5&z4fhtu9=e%!bw5izz")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "1").lower() in ("1", "true", "yes", "y", "on")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "").split(",") if h.strip()] or []
 
 
 # Application definition
@@ -39,7 +63,11 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Local apps
     "accounts",
-    # Local apps
+    # Domain apps
+    "catalog",
+    "cart",
+    "orders",
+    # Legacy or shared utilities (core can later hold non-domain stuff)
     "core",
 ]
 
@@ -62,9 +90,11 @@ TEMPLATES = [
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
+                "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "cart.context_processors.cart",
             ],
         },
     },
@@ -120,7 +150,14 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
+# Serve product images from local Images/ folder via staticfiles
+# e.g., an image named DOG-MOR-001.jpg will be available at /static/DOG-MOR-001.jpg
+STATICFILES_DIRS = [
+    BASE_DIR / "Images",
+]
+
 # Where to redirect after login/logout (can be overridden per-view)
+LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
@@ -131,3 +168,24 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Custom user model
 AUTH_USER_MODEL = "accounts.User"
+
+# Stripe (set your keys via environment variables in production)
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
+STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY", "")
+
+# Email configuration (env-driven; falls back to console in DEBUG if not provided)
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND")
+if not EMAIL_BACKEND and DEBUG:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "no-reply@petfun.local")
+EMAIL_HOST = os.getenv("EMAIL_HOST", "")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "0") or 0)
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "0").lower() in ("1", "true", "yes")
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "0").lower() in ("1", "true", "yes")
+
+# Ensure Django discovers tests without labels by default on Windows
+# Custom test runner sets an explicit top-level directory for unittest discovery.
+TEST_RUNNER = "petfun.test_runner.CustomDiscoverRunner"

@@ -1,53 +1,323 @@
 <!doctype html>
+{% load static %}
 <html lang="es">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{% block title %}PetFun{% endblock %}</title>
+
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'Logo.png' %}">
+    <link rel="shortcut icon" href="{% static 'Logo.png' %}">
+    <link rel="apple-touch-icon" href="{% static 'Logo.png' %}">
+
     <style>
-      :root{--bg:#0b132b;--card:#1c2541;--accent:#5bc0be;--text:#eaeaea;--muted:#9aa0a6;}
+      :root{
+        --bg:#fffdf5;
+        --card:white;
+        --accent:#f9a825;
+        --text:#1a1a1a;
+        --muted:#666;
+      }
+
       *{box-sizing:border-box}
-      body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:var(--bg);color:var(--text)}
-      header{padding:16px 24px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between}
-      .brand{font-weight:700;letter-spacing:.3px}
+
+      body{
+        margin:0;
+        font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;
+        background:var(--bg);
+        color:var(--text);
+      }
+
+      header{
+        padding:16px 24px;
+        border-bottom:1px solid #ddd;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        background:white;
+      }
+
+      .brand{
+        font-weight:700;
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+      }
+
+      .brand img{
+        height:32px;
+        border-radius:8px;
+      }
+
       .container{max-width:960px;margin:28px auto;padding:0 16px}
-      .card{background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:20px}
-      input[type=text],input[type=password]{width:100%;padding:12px 14px;margin:8px 0;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:var(--text)}
-      button{background:var(--accent);color:#06141b;border:0;padding:10px 14px;border-radius:8px;font-weight:600;cursor:pointer}
-      a{color:var(--accent);text-decoration:none}
+
+      .card{
+        background:var(--card);
+        border:1px solid #e6e6e6;
+        border-radius:12px;
+        padding:20px;
+      }
+
+      .layout{
+        display:grid;
+        grid-template-columns:1fr 320px;
+        gap:16px;
+        align-items:start;
+      }
+
+      #side-cart{
+        position:sticky;
+        top:16px;
+        background:white;
+        border:1px solid #e2e2e2;
+        border-radius:12px;
+        padding:12px;
+        max-height:70vh;
+        overflow:auto;
+      }
+
+      #side-cart-list .cart-row{
+        padding:8px;
+        border-bottom:1px solid #eee;
+      }
+
+      /* Controles de cantidad en la cesta */
+      #side-cart .qty-input{
+        width:68px;
+        height:38px;
+        border-radius:10px;
+        border:2px solid rgba(0,0,0,.55);
+        background:#fff;
+        color:#1a1a1a;
+        padding:6px 8px;
+        outline:none;
+        transition:border-color .15s ease;
+      }
+      #side-cart .qty-input:hover{border-color:rgba(0,0,0,.7)}
+      #side-cart .qty-input:focus{border-color:rgba(0,0,0,.85)}
+
+      #side-cart .btn-qty{
+        padding:6px 10px;
+        background:var(--accent);
+        color:#06141b;
+        border:0;
+        border-radius:8px;
+        font-weight:700;
+        box-shadow:0 1px 3px rgba(0,0,0,.2);
+        cursor:pointer;
+        transition:transform .08s ease, box-shadow .2s ease, background .2s ease;
+      }
+      #side-cart .btn-qty:hover{background:#ffbf3f;box-shadow:0 2px 6px rgba(0,0,0,.25);transform:translateY(-1px)}
+      #side-cart .btn-qty:disabled{opacity:.55;cursor:not-allowed;transform:none}
+
+      input[type=text],input[type=password]{
+        width:100%;
+        padding:12px 14px;
+        margin:8px 0;
+        border-radius:8px;
+        border:1px solid #ccc;
+        background:white;
+        color:#1a1a1a;
+      }
+
+      button{
+        background:var(--accent);
+        color:#fff;
+        border:0;
+        padding:10px 14px;
+        border-radius:8px;
+        font-weight:600;
+        cursor:pointer;
+      }
+
+      /* Botón primario naranja (consistente en toda la web) */
+      .btn-primary{
+        padding:12px 20px;
+        background:var(--accent);
+        color:#06141b;
+        border:0;
+        border-radius:10px;
+        font-weight:700;
+        box-shadow:0 2px 6px rgba(0,0,0,.25);
+        cursor:pointer;
+        transition:transform .08s ease, box-shadow .2s ease, background .2s ease;
+      }
+      .btn-primary:hover{background:#ffbf3f;box-shadow:0 4px 10px rgba(0,0,0,.3);transform:translateY(-1px)}
+
+      a{color:#333;text-decoration:none}
       .row{display:flex;gap:16px;flex-wrap:wrap}
       .grow{flex:1 1 360px}
-      .messages{margin:0 0 12px 0;padding:0;list-style:none}
-      .messages li{padding:10px 12px;border-radius:8px;margin-bottom:8px}
-      .messages .success{background:#123; border:1px solid #2a7}
-      .messages .error{background:#301; border:1px solid #c44}
     </style>
+
   </head>
+
   <body>
     <header>
-      <div class="brand">🐾 PetFun</div>
+      <a class="brand" href="/" aria-label="Inicio">
+        <img src="{% static 'Logo.png' %}" alt="PetFun" />
+      </a>
+
       <nav>
         <a href="/" style="margin-right:12px">Inicio</a>
-        <a href="#productos" style="margin-right:12px">Productos</a>
+        <a href="/catalog/" style="margin-right:12px">Productos</a>
+        <a href="/track/" style="margin-right:12px">Seguimiento</a>
+
         {% if request.user.is_authenticated %}
           <span style="margin-right:12px; color:var(--muted)">Hola, {{ request.user.first_name|default:request.user.email }}</span>
+
+          {% if request.user.is_staff %}
+            <a href="/admin/" style="margin-right:12px">Admin</a>
+          {% endif %}
+
           <a href="{% url 'account' %}" style="margin-right:12px">Mi cuenta</a>
           <a href="{% url 'logout' %}">Cerrar sesión</a>
+
         {% else %}
           <a href="{% url 'login' %}" style="margin-right:12px">Iniciar sesión</a>
           <a href="{% url 'register' %}">Crear cuenta</a>
         {% endif %}
       </nav>
     </header>
+
     <div class="container">
-      {% if messages %}
-        <ul class="messages">
-          {% for message in messages %}
-            <li class="{{ message.tags }}">{{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-      {% block content %}{% endblock %}
+      <div class="layout">
+        <main>
+          {% block content %}{% endblock %}
+        </main>
+
+        <aside id="side-cart">
+          <h3>🛒 Cesta</h3>
+          <div id="side-cart-list">
+            {% for it in cart.items.all %}
+              <div class="cart-row" data-pid="{{ it.product_id }}">
+                <div class="name">{{ it.product.name }}</div>
+                <div class="controls">
+                  <button class="qty-minus btn-qty">-</button>
+                  <input id="qty-{{ it.product_id }}" class="qty-input" type="number" min="1" value="{{ it.quantity }}" />
+                  <button class="qty-plus btn-qty">+</button>
+                  <button class="btn-remove">×</button>
+                </div>
+                <div class="prices">
+                  {{ it.unit_price }} € x {{ it.quantity }} = <strong>{{ it.subtotal }} €</strong>
+                </div>
+              </div>
+            {% empty %}
+              <div class="muted">Tu cesta está vacía.</div>
+            {% endfor %}
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+            <strong>Total:</strong>
+            <strong id="side-cart-total">{{ cart.total|default:0 }} €</strong>
+          </div>
+
+          <div style="margin-top:10px;text-align:right">
+            <a href="/checkout/" id="btn-checkout" class="button">Ir a pagar</a>
+          </div>
+        </aside>
+
+      </div>
     </div>
+    <script>
+      // Global cart helpers
+      function getCookie(name){const m=document.cookie.match('(^|;)\\s*'+name+'\\s*=\\s*([^;]+)');return m?m.pop():''}
+      const CSRFTOKEN = getCookie('csrftoken');
+
+      async function addToCart(productId, quantity=1){
+        const res = await fetch('{% url "cart:add" %}', {method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':CSRFTOKEN}, body: JSON.stringify({product_id: productId, quantity})});
+        const data = await res.json();
+        renderCart(data);
+      }
+      async function updateQty(productId, quantity){
+        const res = await fetch('{% url "cart:update" %}', {method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':CSRFTOKEN}, body: JSON.stringify({product_id: productId, quantity})});
+        const data = await res.json();
+        renderCart(data);
+      }
+      async function removeItem(productId){
+        const res = await fetch('{% url "cart:remove" %}', {method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':CSRFTOKEN}, body: JSON.stringify({product_id: productId})});
+        const data = await res.json();
+        renderCart(data);
+      }
+      function renderCart(data){
+        const c = document.querySelector('#side-cart-list');
+        if(!c) return;
+        c.innerHTML = '';
+        data.items.forEach(it => {
+          const row = document.createElement('div');
+          row.className = 'cart-row';
+          row.dataset.pid = it.product_id;
+          row.innerHTML = `
+            <div class="name">${it.name}</div>
+            <div class="controls">
+              <button class="qty-minus btn-qty">-</button>
+              <input id="qty-${it.product_id}" class="qty-input" type="number" min="1" value="${it.quantity}" />
+              <button class="qty-plus btn-qty">+</button>
+              <button class="btn-remove" title="Eliminar">×</button>
+            </div>
+            <div class="prices">${it.unit_price} € x ${it.quantity} = <strong>${it.subtotal} €</strong></div>
+          `;
+          c.appendChild(row);
+        });
+        const t = document.querySelector('#side-cart-total');
+        if(t) t.textContent = (data.total || '0.00') + ' €';
+        try{
+          const itemsCount = (data.items || []).length;
+          if(itemsCount === 0 && window.location.pathname.startsWith('/checkout/')){
+            window.location.href = '/';
+          }
+        }catch(_e){}
+      }
+      document.addEventListener('click', (e) => {
+        if(e.target.classList.contains('btn-add')){
+          if(e.target.disabled) return;
+          const pid = e.target.dataset.productId;
+          if(!pid) return;
+          // try to find a sibling qty input
+          let q = 1;
+          const card = e.target.closest('.card');
+          if(card){
+            const inpt = card.querySelector('.qty-input');
+            if(inpt){
+              const v = parseInt(inpt.value || '1');
+              q = isNaN(v) ? 1 : Math.max(1, v);
+            }
+          }
+          addToCart(pid, q);
+        }
+        if(e.target.classList.contains('qty-minus') || e.target.classList.contains('qty-plus')){
+          const row = e.target.closest('[data-pid]');
+          if(!row) return;
+          const pid = row.dataset.pid;
+          const input = document.querySelector(`#qty-${pid}`);
+          let q = parseInt((input && input.value) || '1');
+          if(e.target.classList.contains('qty-minus')) q = Math.max(1, q-1); else q = q+1;
+          updateQty(pid, q);
+        }
+        if(e.target.classList.contains('btn-remove')){
+          const row = e.target.closest('[data-pid]');
+          if(!row) return;
+          const pid = row.dataset.pid;
+          removeItem(pid);
+        }
+        if(e.target.id === 'btn-checkout'){
+          const hasItems = document.querySelectorAll('#side-cart-list .cart-row').length > 0;
+          if(!hasItems){
+            e.preventDefault();
+            alert('Tu cesta está vacía. Añade productos antes de ir a pagar.');
+          }
+        }
+      });
+      document.addEventListener('change', (e) => {
+        if(e.target && e.target.matches('input[id^="qty-"]')){
+          const input = e.target;
+          const pid = input.id.replace('qty-','');
+          const val = parseInt(input.value || '1');
+          const q = isNaN(val) ? 1 : Math.max(1, val);
+          if(String(q) !== String(input.value)) input.value = q;
+          updateQty(pid, q);
+        }
+      });
+    </script>
+    {% block extra_js %}{% endblock %}
   </body>
 </html>
