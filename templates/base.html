@@ -81,6 +81,35 @@
         border-bottom:1px solid #eee;
       }
 
+      /* Controles de cantidad en la cesta */
+      #side-cart .qty-input{
+        width:68px;
+        height:38px;
+        border-radius:10px;
+        border:2px solid rgba(0,0,0,.55);
+        background:#fff;
+        color:#1a1a1a;
+        padding:6px 8px;
+        outline:none;
+        transition:border-color .15s ease;
+      }
+      #side-cart .qty-input:hover{border-color:rgba(0,0,0,.7)}
+      #side-cart .qty-input:focus{border-color:rgba(0,0,0,.85)}
+
+      #side-cart .btn-qty{
+        padding:6px 10px;
+        background:var(--accent);
+        color:#06141b;
+        border:0;
+        border-radius:8px;
+        font-weight:700;
+        box-shadow:0 1px 3px rgba(0,0,0,.2);
+        cursor:pointer;
+        transition:transform .08s ease, box-shadow .2s ease, background .2s ease;
+      }
+      #side-cart .btn-qty:hover{background:#ffbf3f;box-shadow:0 2px 6px rgba(0,0,0,.25);transform:translateY(-1px)}
+      #side-cart .btn-qty:disabled{opacity:.55;cursor:not-allowed;transform:none}
+
       input[type=text],input[type=password]{
         width:100%;
         padding:12px 14px;
@@ -100,6 +129,20 @@
         font-weight:600;
         cursor:pointer;
       }
+
+      /* Botón primario naranja (consistente en toda la web) */
+      .btn-primary{
+        padding:12px 20px;
+        background:var(--accent);
+        color:#06141b;
+        border:0;
+        border-radius:10px;
+        font-weight:700;
+        box-shadow:0 2px 6px rgba(0,0,0,.25);
+        cursor:pointer;
+        transition:transform .08s ease, box-shadow .2s ease, background .2s ease;
+      }
+      .btn-primary:hover{background:#ffbf3f;box-shadow:0 4px 10px rgba(0,0,0,.3);transform:translateY(-1px)}
 
       a{color:#333;text-decoration:none}
       .row{display:flex;gap:16px;flex-wrap:wrap}
@@ -149,9 +192,9 @@
               <div class="cart-row" data-pid="{{ it.product_id }}">
                 <div class="name">{{ it.product.name }}</div>
                 <div class="controls">
-                  <button class="qty-minus">-</button>
-                  <input id="qty-{{ it.product_id }}" type="number" min="1" value="{{ it.quantity }}" style="width:50px" />
-                  <button class="qty-plus">+</button>
+                  <button class="qty-minus btn-qty">-</button>
+                  <input id="qty-{{ it.product_id }}" class="qty-input" type="number" min="1" value="{{ it.quantity }}" />
+                  <button class="qty-plus btn-qty">+</button>
                   <button class="btn-remove">×</button>
                 </div>
                 <div class="prices">
@@ -206,9 +249,9 @@
           row.innerHTML = `
             <div class="name">${it.name}</div>
             <div class="controls">
-              <button class="qty-minus">-</button>
-              <input id="qty-${it.product_id}" type="number" min="1" value="${it.quantity}" style="width:50px" />
-              <button class="qty-plus">+</button>
+              <button class="qty-minus btn-qty">-</button>
+              <input id="qty-${it.product_id}" class="qty-input" type="number" min="1" value="${it.quantity}" />
+              <button class="qty-plus btn-qty">+</button>
               <button class="btn-remove" title="Eliminar">×</button>
             </div>
             <div class="prices">${it.unit_price} € x ${it.quantity} = <strong>${it.subtotal} €</strong></div>
