@@ -34,7 +34,7 @@ def account(request):
 			profile_form = ProfileForm(request.POST, instance=user)
 			if profile_form.is_valid():
 				profile_form.save()
-				messages.success(request, "Perfil actualizado correctamente.")
+				messages.success(request, "Perfil actualizado correctamente")
 				return redirect("account")
 		elif "submit_password" in request.POST:
 			pwd_form = PasswordChangeForm(user, request.POST)
