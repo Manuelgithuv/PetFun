@@ -259,6 +259,8 @@
         <a href="{% url 'register' %}">Crear cuenta</a>
       {% endif %}
          <a href="/track/" style="margin-right:12px">Seguimiento</a>
+          {% if request.path != '/checkout/' %}
+          
        <aside id="side-cart" class="side-cart">
   <h3 class="side-cart-title">🛒 Tu Cesta</h3>
 
@@ -301,7 +303,7 @@
     <a href="/checkout/" class="checkout-btn">Ir a pagar</a>
   </div>
 </aside>
-
+ {% endif %}
 
   
 
