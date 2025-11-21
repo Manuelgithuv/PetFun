@@ -1,11 +1,60 @@
 {% extends "base.html" %}
+{% block title %}Pedido Confirmado | PetFun{% endblock %}
 {% block content %}
-<h1>Pedido confirmado</h1>
-<p>¡Gracias por tu compra! Tu código de seguimiento es:</p>
-<div class="card">
-  <h2>{{ order.tracking_code }}</h2>
-  <p>Total: <strong>{{ order.total }} €</strong></p>
-  <p>Estado: {{ order.get_status_display }}</p>
+
+<div class="confirmation-container">
+  <h1>Pedido Confirmado</h1>
+  <p>¡Gracias por tu compra! Tu código de seguimiento es:</p>
+
+  <div class="confirmation-card">
+    <h2>{{ order.tracking_code }}</h2>
+    <p>Total: <strong>{{ order.total }} €</strong></p>
+    <p>Estado: {{ order.get_status_display }}</p>
+  </div>
+
+  <a href="/catalog/" class="btn-back">Volver al catálogo</a>
 </div>
-<p><a href="/catalog/">Volver al catálogo</a></p>
+
+<style>
+.confirmation-container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 20px 16px;
+  text-align: center;
+}
+
+.confirmation-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  margin: 20px 0;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+}
+
+.confirmation-card h2 {
+  font-size: 28px;
+  margin: 0 0 12px 0;
+  color: #111;
+}
+
+.confirmation-card p {
+  font-size: 16px;
+  margin: 6px 0;
+}
+
+.btn-back {
+  display: inline-block;
+  padding: 12px 20px;
+  background: #f9a825;
+  color: #06141b;
+  font-weight: 700;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+.btn-back:hover {
+  background: #ffbf3f;
+}
+</style>
+
 {% endblock %}

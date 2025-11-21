@@ -1,6 +1,262 @@
 {% extends "base.html" %}
+{% load static %}
+{% block title %}Tu Cesta | PetFun{% endblock %}
 {% block content %}
-<h1>Carrito</h1>
-<p>Revisa tu cesta y continúa al pago.</p>
-<a class="button" href="{% url 'orders:checkout_payment' %}">Continuar</a>
+{% load catalog_extras %}
+{% csrf_token %}
+
+
+<style>
+.cart-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px 16px;
+}
+
+.cart-product {
+  display: flex;
+  gap: 16px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+  background: #fff;
+}
+
+.cart-product .img-wrapper {
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #f5f5f5;
+}
+
+.cart-product .img-wrapper img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.cart-product .info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cart-product .name {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.cart-product .price, .cart-product .subtotal {
+  color: #555;
+  margin-bottom: 8px;
+}
+
+.cart-product .qty-input {
+  width: 60px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.cart-total {
+  text-align: right;
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 16px;
+}
+
+.checkout-btn {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 12px 20px;
+  background: #f9a825;
+  color: #06141b;
+  font-weight: 700;
+  border-radius: 8px;
+  text-decoration: none;
+}
+.checkout-btn:hover { background: #ffbf3f; }
+</style>
+
+<div class="cart-container">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+  <h1>Tu Cesta</h1>
+
+  {% if cart.items.all %}
+    {% for it in cart.items.all %}
+      <div class="cart-product">
+        <div class="img-wrapper">
+          <img src="{% product_image_src it.product %}" alt="{{ it.product.name }}">
+        </div>
+        <div class="info">
+          <div class="name">{{ it.product.name }} {% if it.product.stock == 0 %}<span style="color:#ff6b6b;">· Agotado</span>{% endif %}</div>
+          <div class="price">Precio unitario: {{ it.product.price }} €</div>
+          <div class="subtotal">Subtotal: {{ it.subtotal }} €</div>
+          <div>
+            Cantidad: 
+            <input type="number" class="qty-input" min="1" value="{{ it.quantity }}" {% if it.product.stock == 0 %}disabled{% endif %} data-pid="{{ it.product.id }}">
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+
+    <div class="cart-total">
+      Total: {{ cart.total|default:"0.00" }} €
+    </div>
+
+    <a href="{% url 'orders:checkout_payment' %}" class="checkout-btn">Continuar al pago</a>
+  {% else %}
+    <p>Tu cesta está vacía.</p>
+  {% endif %}
+</div>
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const container = document.querySelector('.cart-container');
+  if (!container) return;
+
+  // CSRF token: lo tomamos del input hidden que ya tienes en el DOM
+  const csrftokenInput = container.querySelector('input[name="csrfmiddlewaretoken"]');
+  const csrftoken = csrftokenInput ? csrftokenInput.value : '';
+
+  // Debounce helper
+  function debounce(fn, wait){
+    let t;
+    return (...args) => {
+      clearTimeout(t);
+      t = setTimeout(()=> fn(...args), wait);
+    };
+  }
+
+  // Parse float price from text like "Precio unitario: 12.50 €"
+  function parsePrice(text){
+    if(!text) return 0;
+    const m = text.match(/([\d.,]+)/);
+    if(!m) return 0;
+    // replace comma with dot and parse
+    return parseFloat(m[1].replace(',', '.')) || 0;
+  }
+
+  // Recalcula total sumando subtotales visibles en el DOM
+  function recalcTotalFromDOM(){
+    let total = 0;
+    container.querySelectorAll('.cart-product').forEach(prod => {
+      const subEl = prod.querySelector('.subtotal');
+      if(subEl){
+        const m = subEl.textContent.match(/([\d.,]+)/);
+        if(m) total += parseFloat(m[1].replace(',', '.')) || 0;
+      }
+    });
+    const totalEl = container.querySelector('.cart-total');
+    if(totalEl) totalEl.textContent = 'Total: ' + total.toFixed(2) + ' €';
+  }
+
+  // Función que hace la petición al servidor
+  async function sendUpdate(pid, qty, productDiv, optimisticSubtotal){
+    // Marcar estado updating
+    productDiv.classList.add('updating');
+
+    // Optimistic: actualizar subtotal ya en DOM
+    if(typeof optimisticSubtotal === 'number'){
+      const subEl = productDiv.querySelector('.subtotal');
+      if(subEl) subEl.textContent = 'Subtotal: ' + optimisticSubtotal.toFixed(2) + ' €';
+      recalcTotalFromDOM();
+    }
+
+    try {
+      const res = await fetch("{% url 'cart:update' %}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrftoken,
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ product_id: pid, quantity: qty })
+      });
+
+      if (!res.ok) {
+        // server returned error status
+        const txt = await res.text().catch(()=>null);
+        throw new Error(txt || 'Error al actualizar (status ' + res.status + ')');
+      }
+
+      const data = await res.json();
+
+      // Actualiza subtotal y total desde la respuesta del servidor (fuente de verdad)
+      const item = (data.items || []).find(i => Number(i.product_id) === Number(pid));
+      if(item){
+        const subEl = productDiv.querySelector('.subtotal');
+        if(subEl) subEl.textContent = 'Subtotal: ' + Number(item.subtotal).toFixed(2) + ' €';
+      }
+      const totalEl = container.querySelector('.cart-total');
+      if(totalEl) totalEl.textContent = 'Total: ' + (data.total || '0.00') + ' €';
+
+    } catch (err) {
+      console.error('Update cart error:', err);
+      // revert: volver a la cantidad anterior que tenía el input en dataset (si existe)
+      const input = productDiv.querySelector('.qty-input');
+      if(input && input.dataset.prevQty) input.value = input.dataset.prevQty;
+      // recalcular total desde DOM para dejarlo consistente
+      recalcTotalFromDOM();
+      alert('No se pudo actualizar la cesta. Inténtalo de nuevo.');
+    } finally {
+      productDiv.classList.remove('updating');
+    }
+  }
+
+  // Manejador principal para un input concreto
+  function handleQtyInput(input){
+    const productDiv = input.closest('.cart-product');
+    if(!productDiv) return;
+
+    const pid = input.dataset.pid;
+    let qty = parseInt(input.value, 10);
+    if(isNaN(qty) || qty < 1) qty = 1;
+    // Guardamos el qty previo por si hay que revertir
+    input.dataset.prevQty = input.dataset.prevQty ?? input.value;
+    input.value = qty;
+
+    // obtener precio unitario desde DOM (fuente visible)
+    const priceEl = productDiv.querySelector('.price');
+    const unit = parsePrice(priceEl ? priceEl.textContent : '');
+    const optimisticSubtotal = unit * qty;
+
+    // enviar al servidor (debounced si viene de typing)
+    sendUpdate(pid, qty, productDiv, optimisticSubtotal);
+  }
+
+  // Delegación de eventos:
+  // - input: debounce (usuario tipeando)
+  // - change: inmediata (cuando pierde foco o usa spinner)
+  // - keydown Enter: inmediata
+  const debouncedHandler = debounce((input) => handleQtyInput(input), 700);
+
+  container.addEventListener('input', (e) => {
+    if(!e.target.classList || !e.target.classList.contains('qty-input')) return;
+    debouncedHandler(e.target);
+  });
+
+  container.addEventListener('change', (e) => {
+    if(!e.target.classList || !e.target.classList.contains('qty-input')) return;
+    handleQtyInput(e.target); // immediate
+  });
+
+  container.addEventListener('keydown', (e) => {
+    if(e.key !== 'Enter') return;
+    if(!e.target.classList || !e.target.classList.contains('qty-input')) return;
+    e.preventDefault();
+    handleQtyInput(e.target);
+  });
+
+});
+</script>
 {% endblock %}

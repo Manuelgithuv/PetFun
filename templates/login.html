@@ -1,22 +1,99 @@
 {% extends "base.html" %}
 {% block title %}Iniciar sesión | PetFun{% endblock %}
+{% load static %}
 {% block content %}
-  <div class="row">
-    <div class="card grow" style="max-width:520px;margin:0 auto">
-      <h2>Iniciar sesión</h2>
-      <form method="post" action="{% url 'login' %}{% if next %}?next={{ next|urlencode }}{% endif %}">
-        {% csrf_token %}
-        <label for="id_email">Correo electrónico</label>
-        <input id="id_email" name="email" type="text" placeholder="tu@email.com" required />
+<style>
+  .login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 16px;
+    min-height: 80vh;
+  }
 
-        <label for="id_password">Contraseña</label>
-        <input id="id_password" name="password" type="password" placeholder="••••••••" required />
+  .login-logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 32px; /* espacio debajo del logo */
+  }
 
-        {% if next %}
-          <input type="hidden" name="next" value="{{ next }}" />
-        {% endif %}
-        <button type="submit" class="btn-primary">Entrar</button>
-      </form>
+  .login-logo img {
+    height: 64px;
+  }
+
+  .login-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 32px 24px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* espacio entre elementos dentro de la tarjeta */
+  }
+
+  .login-card h2 {
+    text-align: center;
+    color: #111;
+    font-size: 28px;
+    margin: 0 0 16px 0;
+  }
+
+  .login-card input {
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 16px; /* espacio entre inputs */
+  }
+
+  /* quitar margen del último input */
+  .login-card input:last-of-type {
+    margin-bottom: 24px; /* espacio extra antes del botón */
+  }
+
+  .btn-login {
+    padding: 12px 16px;
+    background: #f9a825;
+    color: #fff;
+    border: 0;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    width: 100%;
+    font-size: 16px;
+  }
+
+  .btn-login:hover {
+    background: #ffbf3f;
+  }
+</style>
+
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="{% static 'Logo.png' %}" alt="PetFun Logo">
     </div>
+    
+    <h2>Iniciar sesión</h2>
+
+    <form method="post" action="{% url 'login' %}{% if next %}?next={{ next|urlencode }}{% endif %}">
+      {% csrf_token %}
+
+      <input id="id_email" name="email" type="text" placeholder="Correo electrónico" required />
+      <input id="id_password" name="password" type="password" placeholder="Contraseña" required />
+
+      {% if next %}
+        <input type="hidden" name="next" value="{{ next }}" />
+      {% endif %}
+
+      <button type="submit" class="btn-login">Iniciar sesión</button>
+    </form>
   </div>
+</div>
 {% endblock %}

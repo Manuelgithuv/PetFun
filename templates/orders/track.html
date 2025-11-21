@@ -1,34 +1,167 @@
 {% extends "base.html" %}
 {% block content %}
 <style>
-  .btn-search{padding:8px 18px;background:#f9a825;color:#fff;border:0;border-radius:8px;font-weight:600;box-shadow:0 2px 4px rgba(0,0,0,0.2);cursor:pointer;transition:background .2s ease}
-  .btn-search:hover{background:#ffbf3f}
-  @media (hover:none){.btn-search{transform:none}}
+.card {
+  background: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.1);
+  margin-bottom: 20px;
+}
+
+.btn-search {
+  padding: 8px 18px;
+  background: #f9a825;
+  color: #fff;
+  border: 0;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s ease;
+}
+.btn-search:hover { background: #ffbf3f; }
+
+.tracking-container {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+.tracking-steps {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin-top: 24px;
+  margin-bottom: 24px;
+  padding: 0 20px;
+}
+.tracking-steps::before {
+  content: '';
+  position: absolute;
+  top: 18px;
+  left: 20px;
+  right: 20px;
+  height: 4px;
+  background: #eee;
+  z-index: 0;
+  border-radius: 2px;
+}
+
+.tracking-progress {
+  position: absolute;
+  top: 18px;
+  left: 20px;
+  height: 4px;
+  background: #f9a825;
+  z-index: 0;
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+.tracking-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.tracking-step .circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+.tracking-step.completed .circle {
+  border-color: #f9a825;
+  background: #f9a825;
+  color: #fff;
+}
+.tracking-step.current .circle {
+  border-color: #f9a825;
+  background: #fff9c4;
+}
+.tracking-step .label {
+  margin-top: 8px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 14px;
+  color: #555;
+}
 </style>
-<h1>Seguimiento de pedido</h1>
-<form method="post" class="card" style="margin-bottom:12px">
+
+<h1 style="margin-left: 280px; margin-top: 20px;">Seguimiento de pedido</h1>
+
+{% if not order %}
+<form method="post" class="card" style="max-width:400px; margin:20px auto;">
   {% csrf_token %}
   <label for="track-code">Código de seguimiento</label>
-  <input id="track-code" type="text" name="code" value="{{ code }}" placeholder="Ej: PT-202511-ABC12345" required />
-  <div style="margin-top:10px"><button type="submit" class="btn-search">Buscar</button></div>
+  <input id="track-code" type="text" name="code" value="{{ code }}" placeholder="Ej: PT-202511-ABC12345" required
+         style="width:100%; padding:10px; margin-top:4px; border-radius:6px; border:1px solid #ccc; margin-bottom:12px;" />
+  <button type="submit" class="btn-search">Buscar</button>
 </form>
+{% endif %}
 
 {% if order %}
-  <div class="card">
-    <h2>Pedido {{ order.tracking_code }}</h2>
-    <p>Estado: <strong>{{ order.get_status_display }}</strong></p>
-    <p>Total: <strong>{{ order.total }} €</strong></p>
-    <h3>Envío</h3>
-    <p>{{ order.ship_name }}<br/>
-       {{ order.ship_street }} {{ order.ship_number }} {{ order.ship_floor }}<br/>
-       {{ order.ship_city }} {{ order.ship_postal_code }} ({{ order.ship_country }})
+<div class="card tracking-container" style="width:95%; padding:20px;">
+  <h2 style="margin-bottom:12px;">Pedido {{ order.tracking_code }}</h2>
+  <p>Total: <strong>{{ order.total }} €</strong></p>
+
+  {% if order.status == 'cancelado' %}
+    <p style="color:#ff4d4f; font-weight:bold; font-size:1.1em;">
+      ⚠️ Este pedido ha sido cancelado y no llegará.
     </p>
-    <h3>Artículos</h3>
-    <ul>
+  {% else %}
+    <div class="tracking-steps" id="tracking-steps">
+      <div class="tracking-progress" id="tracking-progress"></div>
+    </div>
+  {% endif %}
+
+  <h3>Envío</h3>
+  <p>{{ order.ship_name }}<br/>
+     {{ order.ship_street }} {{ order.ship_number }} {{ order.ship_floor }}<br/>
+     {{ order.ship_city }} {{ order.ship_postal_code }} ({{ order.ship_country }})
+  </p>
+
+  <h3>Artículos</h3>
+  <ul>
     {% for it in order.items.all %}
       <li>{{ it.quantity }} x {{ it.product_name }} — {{ it.subtotal }} €</li>
     {% endfor %}
-    </ul>
-  </div>
+  </ul>
+</div>
+
+<script>
+const steps = ['Recibido', 'Procesando', 'Enviado', 'Entregado'];
+const currentStatus = "{{ order.get_status_display|escapejs }}";
+const container = document.getElementById('tracking-steps');
+const progressBar = document.getElementById('tracking-progress');
+
+const currentIndex = steps.findIndex(step => step.toLowerCase() === currentStatus.toLowerCase());
+const totalSteps = steps.length;
+
+steps.forEach((step, index) => {
+  const div = document.createElement('div');
+  div.classList.add('tracking-step');
+  if(index < currentIndex) div.classList.add('completed');
+  else if(index === currentIndex) div.classList.add('current');
+
+  div.innerHTML = `<div class="circle">${index+1}</div>
+                   <div class="label">${step}</div>`;
+  container.appendChild(div);
+});
+
+// Ajustar ancho de la barra amarilla
+progressBar.style.width = (currentIndex/(totalSteps-1))*100 + '%';
+</script>
 {% endif %}
+
 {% endblock %}

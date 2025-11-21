@@ -1,238 +1,359 @@
 <!doctype html>
 {% load static %}
+{% load catalog_extras %}
 <html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{% block title %}PetFun{% endblock %}</title>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}PetFun{% endblock %}</title>
+  <link rel="icon" href="{% static 'Logo.png' %}">
+  <style>
+    :root{
+      --bg:rgb(255, 252, 242);
+      --accent:#f9a825;
+      --text:#1a1a1a;
+      --muted:#666;
+    }
+    body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text);}
+    a{color:#333;text-decoration:none;}
+    header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:16px 24px;
+      border-bottom:1px solid #ddd;
+      background:rgb(255, 252, 242);
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    .brand img{height:32px; border-radius:8px;}
+    .header-nav a, .header-nav span{margin-left:16px; font-weight:500;}
+    @media(max-width:768px){
+      header{flex-direction:column; align-items:flex-start;}
+      .header-nav a, .header-nav span{margin-left:0;margin-right:12px;}
+    }
 
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'Logo.png' %}">
-    <link rel="shortcut icon" href="{% static 'Logo.png' %}">
-    <link rel="apple-touch-icon" href="{% static 'Logo.png' %}">
+    /* Hero global */
+    .pf-hero-wrapper {
+      padding:80px 0;
+      background: url("{% static 'Banner.png' %}") center/cover no-repeat;
+      position: relative;
+      border-bottom:1px solid rgba(0,0,0,0.05);
+    }
+    .pf-hero-wrapper::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: rgba(0,0,0,0.28);
+    }
+    .pf-hero {
+      max-width:1200px;
+      margin:0 auto;
+      padding:0 24px;
+      display:flex;
+      gap:40px;
+      align-items:flex-start;
+      position:relative;
+      z-index:2;
+    }
+    .pf-hero-left { 
+      flex:1; 
+      color:#06141b; 
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      gap:16px;
+      max-width:50%;
+    }
+    .pf-hero-title { font-size:48px; font-weight:900; margin:0; color:#06141b; line-height:1; }
+    .pf-btn { background:var(--accent); color:#fff; padding:10px 16px; border-radius:8px; font-weight:700; border: none; cursor:pointer;}
+    @media(max-width:980px){
+      .pf-hero { flex-direction:column; padding:0 20px; align-items:flex-start;}
+      .pf-hero-left { max-width:100%; }
+      .pf-hero-title { font-size:34px; }
+    }
 
-    <style>
-      :root{
-        --bg:#fffdf5;
-        --card:white;
-        --accent:#f9a825;
-        --text:#1a1a1a;
-        --muted:#666;
-      }
+.quick-cats {
+  display: flex;
+  gap: 16px;
+  padding-left: 24px; /* mismo que el logo */
+  background: rgb(255, 252, 242);
+}
 
-      *{box-sizing:border-box}
+.quick-cats .dropdown {
+  position: relative;
+}
 
-      body{
-        margin:0;
-        font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;
-        background:var(--bg);
-        color:var(--text);
-      }
+.quick-cats .dropdown a {
+  text-decoration: none;
+  color: #06141b;
+  font-weight: 700;
+  padding: 6px 8px;
+  display: inline-block;
+}
 
-      header{
-        padding:16px 24px;
-        border-bottom:1px solid #ddd;
-        display:flex;
-        align-items:center;
-        justify-content:space-between;
-        background:white;
-      }
+.quick-cats .dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%; /* justo debajo del enlace padre */
+  left: 0;
+  background: rgb(255, 252, 242);
+  min-width: 180px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  z-index: 10;
+  flex-direction: column;
+}
 
-      .brand{
-        font-weight:700;
-        display:inline-flex;
-        align-items:center;
-        gap:8px;
-      }
+.quick-cats .dropdown-content a {
+  padding: 8px 12px;
+  color: #06141b;
+  font-weight: 500;
+}
 
-      .brand img{
-        height:32px;
-        border-radius:8px;
-      }
+.quick-cats .dropdown-content a:hover {
+  background: #f9f9f9;
+}
 
-      .container{max-width:960px;margin:28px auto;padding:0 16px}
+.quick-cats .dropdown:hover .dropdown-content {
+  display: flex; /* se muestra al pasar el ratón */
+  flex-direction: column;
+}
+/* === Side Cart Moderno === */
 
-      .card{
-        background:var(--card);
-        border:1px solid #e6e6e6;
-        border-radius:12px;
-        padding:20px;
-      }
+/* === SIDE CART MODERNO === */
 
-      .layout{
-        display:grid;
-        grid-template-columns:1fr 320px;
-        gap:16px;
-        align-items:start;
-      }
+.side-cart {
+  position: fixed;
+  right: 16px;
+  top: 80px;
+  width: 330px;
+  background: #fff;
+  border-radius: 18px;
+  padding: 18px;
+  max-height: 75vh;
+  overflow-y: auto;
+  z-index: 2000;
+  border: 1px solid #e8e3dc;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.12);
+}
 
-      #side-cart{
-        position:sticky;
-        top:16px;
-        background:white;
-        border:1px solid #e2e2e2;
-        border-radius:12px;
-        padding:12px;
-        max-height:70vh;
-        overflow:auto;
-      }
+.side-cart-title {
+  margin: 0 0 14px;
+  font-size: 20px;
+  font-weight: 800;
+  color: #222;
+}
 
-      #side-cart-list .cart-row{
-        padding:8px;
-        border-bottom:1px solid #eee;
-      }
+.side-cart-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
 
-      /* Controles de cantidad en la cesta */
-      #side-cart .qty-input{
-        width:68px;
-        height:38px;
-        border-radius:10px;
-        border:2px solid rgba(0,0,0,.55);
-        background:#fff;
-        color:#1a1a1a;
-        padding:6px 8px;
-        outline:none;
-        transition:border-color .15s ease;
-      }
-      #side-cart .qty-input:hover{border-color:rgba(0,0,0,.7)}
-      #side-cart .qty-input:focus{border-color:rgba(0,0,0,.85)}
+.cart-row {
+  display: flex;
+  gap: 12px;
+  background: #faf7f3;
+  border: 1px solid #e7dfd8;
+  padding: 12px;
+  border-radius: 12px;
+  align-items: center;
+}
 
-      #side-cart .btn-qty{
-        padding:6px 10px;
-        background:var(--accent);
-        color:#06141b;
-        border:0;
-        border-radius:8px;
-        font-weight:700;
-        box-shadow:0 1px 3px rgba(0,0,0,.2);
-        cursor:pointer;
-        transition:transform .08s ease, box-shadow .2s ease, background .2s ease;
-      }
-      #side-cart .btn-qty:hover{background:#ffbf3f;box-shadow:0 2px 6px rgba(0,0,0,.25);transform:translateY(-1px)}
-      #side-cart .btn-qty:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.cart-img {
+  width: 80px;          /* ancho fijo */
+  height: 80px;         /* alto fijo */
+  object-fit: contain;   /* mantiene proporción sin recortar */
+  border-radius: 10px;
+  border: 1px solid #e0d8cf;
+  background: #fff;      /* fondo blanco para espacios vacíos */
+}
 
-      input[type=text],input[type=password]{
-        width:100%;
-        padding:12px 14px;
-        margin:8px 0;
-        border-radius:8px;
-        border:1px solid #ccc;
-        background:white;
-        color:#1a1a1a;
-      }
+.cart-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
-      button{
-        background:var(--accent);
-        color:#fff;
-        border:0;
-        padding:10px 14px;
-        border-radius:8px;
-        font-weight:600;
-        cursor:pointer;
-      }
+.qty-select {
+  width: 70px;
+  padding: 6px;
+  border-radius: 8px;
+  border: 1px solid #d6cfc7;
+  background: #fff;
+  font-size: 14px;
+}
+.cart-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: #333;
+}
 
-      /* Botón primario naranja (consistente en toda la web) */
-      .btn-primary{
-        padding:12px 20px;
-        background:var(--accent);
-        color:#06141b;
-        border:0;
-        border-radius:10px;
-        font-weight:700;
-        box-shadow:0 2px 6px rgba(0,0,0,.25);
-        cursor:pointer;
-        transition:transform .08s ease, box-shadow .2s ease, background .2s ease;
-      }
-      .btn-primary:hover{background:#ffbf3f;box-shadow:0 4px 10px rgba(0,0,0,.3);transform:translateY(-1px)}
+.cart-total-item {
+  font-size: 15px;
+  color: #444;
+}
 
-      a{color:#333;text-decoration:none}
-      .row{display:flex;gap:16px;flex-wrap:wrap}
-      .grow{flex:1 1 360px}
+.btn-remove {
+  background: #ffe5e5;
+  border: 1px solid #ffcccc;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 18px;
+  cursor: pointer;
+  color: #a33;
+  align-self: flex-start;
+}
+.btn-remove:hover {
+  background: #ffdcdc;
+}
 
-      .messages{margin-bottom:16px}
-      .alert{padding:12px 16px;border-radius:10px;margin-bottom:8px;font-weight:600}
-      .alert-success{background:#e9f7ef;color:#1b5e20}
-      .alert-error{background:#fdecea;color:#b71c1c}
-      .alert-info{background:#e3f2fd;color:#0d47a1}
-      .alert-warning{background:#fff8e1;color:#7c4a03}
-    </style>
+.side-cart-footer {
+  margin-top: 18px;
+  border-top: 1px solid #e7e0d7;
+  padding-top: 14px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 17px;
+}
 
-  </head>
+.side-cart-checkout {
+  margin-top: 14px;
+}
 
-  <body>
-    <header>
-      <a class="brand" href="/" aria-label="Inicio">
-        <img src="{% static 'Logo.png' %}" alt="PetFun" />
-      </a>
+.checkout-btn {
+  display: block;
+  background: var(--accent);
+  padding: 12px 16px;
+  text-align: center;
+  font-weight: 700;
+  border-radius: 12px;
+  color: #06141b;
+  text-decoration: none;
+  box-shadow: 0 4px 10px rgba(0,0,0,.15);
+}
+.checkout-btn:hover {
+  opacity: .9;
+}
 
-      <nav>
-        <a href="/" style="margin-right:12px">Inicio</a>
-        <a href="/catalog/" style="margin-right:12px">Productos</a>
-        <a href="/track/" style="margin-right:12px">Seguimiento</a>
 
-        {% if request.user.is_authenticated %}
-          <span style="margin-right:12px; color:var(--muted)">Hola, {{ request.user.first_name|default:request.user.email }}</span>
 
-          {% if request.user.is_staff %}
-            <a href="/admin/" style="margin-right:12px">Admin</a>
-          {% endif %}
+  </style>
+</head>
+<body>
 
-          <a href="{% url 'account' %}" style="margin-right:12px">Mi cuenta</a>
-          <a href="{% url 'logout' %}">Cerrar sesión</a>
-
-        {% else %}
-          <a href="{% url 'login' %}" style="margin-right:12px">Iniciar sesión</a>
-          <a href="{% url 'register' %}">Crear cuenta</a>
-        {% endif %}
-      </nav>
-    </header>
-
-    <div class="container">
-      {% if messages %}
-        <div class="messages">
-          {% for message in messages %}
-            <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
-          {% endfor %}
-        </div>
+  <!-- Header -->
+  <header>
+    <a class="brand" href="/"><img src="{% static 'Logo.png' %}" alt="PetFun"></a>
+    <nav class="header-nav">
+      {% if request.user.is_authenticated %}
+        <span>Hola, {{ request.user.first_name|default:request.user.email }}</span>
+        {% if request.user.is_staff %}<a href="/admin/">Admin</a>{% endif %}
+        <a href="{% url 'account' %}">Mi cuenta</a>
+        <a href="{% url 'logout' %}">Cerrar sesión</a>
+      {% else %}
+        <a href="{% url 'login' %}">Iniciar sesión</a>
+        <a href="{% url 'register' %}">Crear cuenta</a>
       {% endif %}
-      <div class="layout">
-        <main>
-          {% block content %}{% endblock %}
-        </main>
+         <a href="/track/" style="margin-right:12px">Seguimiento</a>
+       <aside id="side-cart" class="side-cart">
+  <h3 class="side-cart-title">🛒 Tu Cesta</h3>
 
-        <aside id="side-cart">
-          <h3>🛒 Cesta</h3>
-          <div id="side-cart-list">
-            {% for it in cart.items.all %}
-              <div class="cart-row" data-pid="{{ it.product_id }}">
-                <div class="name">{{ it.product.name }}</div>
-                <div class="controls">
-                  <button class="qty-minus btn-qty">-</button>
-                  <input id="qty-{{ it.product_id }}" class="qty-input" type="number" min="1" value="{{ it.quantity }}" />
-                  <button class="qty-plus btn-qty">+</button>
-                  <button class="btn-remove">×</button>
-                </div>
-                <div class="prices">
-                  {{ it.unit_price }} € x {{ it.quantity }} = <strong>{{ it.subtotal }} €</strong>
-                </div>
-              </div>
-            {% empty %}
-              <div class="muted">Tu cesta está vacía.</div>
-            {% endfor %}
+  <div id="side-cart-list" class="side-cart-list">
+    {% for it in cart.items.all %}
+      <div class="cart-row" data-pid="{{ it.product_id }}">
+
+        <!-- Imagen del producto -->
+        <img class="cart-img" src="{% product_image_src it.product %}" alt="{{ it.product.name }}">
+
+        <div class="cart-content">
+
+          <div class="cart-name">{{ it.product.name }}</div>
+
+          <!-- Cantidad con dropdown -->
+          <select class="qty-select" data-pid="{{ it.product_id }}" data-quantity="{{ it.quantity }}"></select>
+
+
+
+          <!-- Solo el precio TOTAL del artículo -->
+          <div class="cart-total-item">
+            <strong>{{ it.subtotal }} €</strong>
           </div>
 
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-            <strong>Total:</strong>
-            <strong id="side-cart-total">{{ cart.total|default:0 }} €</strong>
-          </div>
+          <button class="btn-remove">×</button>
 
-          <div style="margin-top:10px;text-align:right">
-            <a href="/checkout/" id="btn-checkout" class="button">Ir a pagar</a>
-          </div>
-        </aside>
-
+        </div>
       </div>
+    {% empty %}
+      <div class="side-cart-empty">Tu cesta está vacía.</div>
+    {% endfor %}
+  </div>
+
+  <div class="side-cart-footer">
+    <span>Total:</span>
+    <strong id="side-cart-total">{{ cart.total|default:0 }} €</strong>
+  </div>
+
+  <div class="side-cart-checkout">
+    <a href="/checkout/" class="checkout-btn">Ir a pagar</a>
+  </div>
+</aside>
+
+
+  
+
+
+    </nav>
+
+    {% if request.user.is_authenticated %}
+    <!-- Categorías rápidas: Perros y Gatos -->
+    <div class="quick-cats-wrapper" style="width:100%; background:white;">
+      <nav class="quick-cats">
+        <div class="dropdown">
+          <a href="/catalog/?parent=Juguetes para Perro">Perros ▾</a>
+          <div class="dropdown-content">
+            <a href="/catalog/?parent=Juguetes para Perro&sub=De inteligencia">De inteligencia</a>
+            <a href="/catalog/?parent=Juguetes para Perro&sub=Mordedores">Mordedores</a>
+            <a href="/catalog/?parent=Juguetes para Perro&sub=Pelotas">Pelotas</a>
+            <a href="/catalog/?parent=Juguetes para Perro&sub=Peluches">Peluches</a>
+          </div>
+        </div>
+
+        <div class="dropdown">
+          <a href="/catalog/?parent=Juguetes para Gato">Gatos ▾</a>
+          <div class="dropdown-content">
+            <a href="/catalog/?parent=Juguetes para Gato&sub=Caña">Caña</a>
+            <a href="/catalog/?parent=Juguetes para Gato&sub=Hierba gatera">Hierba gatera</a>
+            <a href="/catalog/?parent=Juguetes para Gato&sub=Ratones de juguete">Ratones de juguete</a>
+            <a href="/catalog/?parent=Juguetes para Gato&sub=Túneles">Túneles</a>
+          </div>
+        </div>
+      </nav>
     </div>
-    <script>
+    {% endif %}
+  </header>
+
+  {% if request.path != '/login/' and request.path != '/register/' and request.path != '/account/' %}
+    <!-- Hero global -->
+    <section class="pf-hero-wrapper">
+      <div class="pf-hero">
+        <div class="pf-hero-left">
+          <h1 class="pf-hero-title">Todo para tus mascotas en un solo lugar 🐾</h1>
+          <button class="pf-btn" type="button" onclick="window.location.href='/catalog/'">Ver Catálogo</button>
+        </div>
+        <div class="pf-hero-right" aria-hidden="true"></div>
+      </div>
+    </section>
+  {% endif %}
+
+  {% block content %}{% endblock %}
+
+
+  <!-- Scripts y carrito -->
+   <script>
       // Global cart helpers
       function getCookie(name){const m=document.cookie.match('(^|;)\\s*'+name+'\\s*=\\s*([^;]+)');return m?m.pop():''}
       const CSRFTOKEN = getCookie('csrftoken');
@@ -252,35 +373,44 @@
         const data = await res.json();
         renderCart(data);
       }
-      function renderCart(data){
-        const c = document.querySelector('#side-cart-list');
-        if(!c) return;
-        c.innerHTML = '';
-        data.items.forEach(it => {
-          const row = document.createElement('div');
-          row.className = 'cart-row';
-          row.dataset.pid = it.product_id;
-          row.innerHTML = `
-            <div class="name">${it.name}</div>
-            <div class="controls">
-              <button class="qty-minus btn-qty">-</button>
-              <input id="qty-${it.product_id}" class="qty-input" type="number" min="1" value="${it.quantity}" />
-              <button class="qty-plus btn-qty">+</button>
-              <button class="btn-remove" title="Eliminar">×</button>
+     function renderCart(data){
+    const c = document.querySelector('#side-cart-list');
+    if(!c) return;
+    c.innerHTML = '';
+
+    data.items.forEach(it => {
+        const row = document.createElement('div');
+        row.className = 'cart-row';
+        row.dataset.pid = it.product_id;
+
+        // Generar opciones 1-10
+        let options = '';
+        for(let n=1; n<=10; n++){
+            options += `<option value="${n}" ${n === it.quantity ? 'selected' : ''}>${n}</option>`;
+        }
+
+        row.innerHTML = `
+            <img class="cart-img" src="${it.image_url}" alt="${it.name}">
+            <div class="cart-content">
+              <div class="cart-name">${it.name}</div>
+              <select class="qty-select" data-pid="${it.product_id}">
+                ${[...Array(10).keys()].map(n => `<option value="${n+1}" ${n+1 === it.quantity ? 'selected' : ''}>${n+1}</option>`).join('')}
+              </select>
+              <div class="cart-total-item"><strong>${it.subtotal} €</strong></div>
+              <button class="btn-remove">×</button>
             </div>
-            <div class="prices">${it.unit_price} € x ${it.quantity} = <strong>${it.subtotal} €</strong></div>
           `;
-          c.appendChild(row);
-        });
-        const t = document.querySelector('#side-cart-total');
-        if(t) t.textContent = (data.total || '0.00') + ' €';
-        try{
-          const itemsCount = (data.items || []).length;
-          if(itemsCount === 0 && window.location.pathname.startsWith('/checkout/')){
-            window.location.href = '/';
-          }
-        }catch(_e){}
-      }
+
+
+        c.appendChild(row);
+    });
+
+    const t = document.querySelector('#side-cart-total');
+    if(t) t.textContent = (data.total || '0.00') + ' €';
+}
+
+
+
       document.addEventListener('click', (e) => {
         if(e.target.classList.contains('btn-add')){
           if(e.target.disabled) return;
@@ -331,7 +461,44 @@
           updateQty(pid, q);
         }
       });
+      document.querySelectorAll('.qty-select').forEach(sel => {
+  const currentQty = parseInt(sel.dataset.quantity || 1);
+  sel.innerHTML = [...Array(10).keys()]
+    .map(n => `<option value="${n+1}" ${n+1 === currentQty ? 'selected' : ''}>${n+1}</option>`)
+    .join('');
+});
+      document.addEventListener('change', (e) => {
+        if(e.target.classList.contains('qty-select')){
+          const pid = e.target.dataset.pid;
+          const qty = parseInt(e.target.value || '1');
+          updateQty(pid, qty);
+        }
+      });
+
+const sideCart = document.querySelector('#side-cart-list');
+
+sideCart.addEventListener('click', (e)=>{
+    const row = e.target.closest('.cart-row');
+    if(!row) return;
+    const pid = row.dataset.pid;
+
+    if(e.target.classList.contains('btn-remove')){
+        removeItem(pid);
+    }
+});
+
+sideCart.addEventListener('change', (e)=>{
+    if(e.target.classList.contains('qty-select')){
+        const pid = e.target.dataset.pid;
+        const qty = parseInt(e.target.value);
+        updateQty(pid, qty);
+    }
+});
+
+
+
     </script>
-    {% block extra_js %}{% endblock %}
-  </body>
+
+
+</body>
 </html>

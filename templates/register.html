@@ -1,71 +1,137 @@
 {% extends "base.html" %}
 {% block title %}Crear cuenta | PetFun{% endblock %}
+{% load static %}
 {% block content %}
-  <div class="row">
-    <div class="card grow" style="max-width:640px;margin:0 auto">
-      <h2>Crear cuenta</h2>
-      <form method="post" action="{% url 'register' %}">
-        {% csrf_token %}
-        <div class="row">
-          <div class="grow">
-            <label>Email</label>
-            <input type="text" name="email" value="{{ form.email.value|default:'' }}" required />
-          </div>
-        </div>
-        <div class="row">
-          <div class="grow">
-            <label>Nombre</label>
-            <input type="text" name="first_name" value="{{ form.first_name.value|default:'' }}" required />
-          </div>
-          <div class="grow">
-            <label>Apellidos</label>
-            <input type="text" name="last_name" value="{{ form.last_name.value|default:'' }}" required />
-          </div>
-        </div>
-        <div class="row">
-          <div class="grow">
-            <label>Teléfono</label>
-            <input type="text" name="phone" value="{{ form.phone.value|default:'' }}" required />
-          </div>
-        </div>
-        <div class="row">
-          <div class="grow">
-            <label>Dirección</label>
-            <input type="text" name="address" value="{{ form.address.value|default:'' }}" required />
-          </div>
-        </div>
-        <div class="row">
-          <div class="grow">
-            <label>Ciudad</label>
-            <input type="text" name="city" value="{{ form.city.value|default:'' }}" required />
-          </div>
-          <div class="grow">
-            <label>Código postal</label>
-            <input type="text" name="postal_code" value="{{ form.postal_code.value|default:'' }}" required />
-          </div>
-        </div>
+<style>
+  .register-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 16px;
+    min-height: 80vh;
+  }
 
-        <div class="row">
-          <div class="grow">
-            <label>Contraseña</label>
-            <input type="password" name="password" required />
-          </div>
-          <div class="grow">
-            <label>Repetir contraseña</label>
-            <input type="password" name="password2" required />
-          </div>
-        </div>
+  .register-logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 32px; /* espacio debajo del logo */
+  }
 
-        {% if form.errors %}
-          <ul class="messages">
-            {% for field, errors in form.errors.items %}
-              {% for e in errors %}<li class="error">{{ e }}</li>{% endfor %}
-            {% endfor %}
-          </ul>
-        {% endif %}
+  .register-logo img {
+    height: 64px;
+  }
 
-        <button type="submit" class="btn-primary">Crear cuenta</button>
-      </form>
+  .register-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 32px 24px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* espacio entre elementos */
+  }
+
+  .register-card h2 {
+    text-align: center;
+    color: #111;
+    font-size: 28px;
+    margin: 0 0 16px 0;
+  }
+
+  .register-card input {
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 16px; /* espacio entre inputs */
+  }
+
+  .register-card input:last-of-type {
+    margin-bottom: 24px; /* espacio antes del botón */
+  }
+
+  .btn-register {
+    padding: 12px 16px;
+    background: #f9a825;
+    color: #fff;
+    border: 0;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    width: 100%;
+    font-size: 16px;
+  }
+
+  .btn-register:hover {
+    background: #ffbf3f;
+  }
+
+  .login-link {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 14px;
+  }
+
+  .login-link a {
+    color: #f9a825;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .login-link a:hover {
+    text-decoration: underline;
+  }
+
+  .messages {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 16px 0;
+    color: #b71c1c;
+    font-weight: 600;
+  }
+</style>
+
+<div class="register-container">
+  <div class="register-card">
+    <div class="register-logo">
+      <img src="{% static 'Logo.png' %}" alt="PetFun Logo">
+    </div>
+
+    <h2>Crear cuenta</h2>
+
+    <form method="post" action="{% url 'register' %}">
+      {% csrf_token %}
+
+      <input type="text" name="email" placeholder="Correo electrónico" value="{{ form.email.value|default:'' }}" required />
+      <input type="text" name="first_name" placeholder="Nombre" value="{{ form.first_name.value|default:'' }}" required />
+      <input type="text" name="last_name" placeholder="Apellidos" value="{{ form.last_name.value|default:'' }}" required />
+      <input type="text" name="phone" placeholder="Teléfono" value="{{ form.phone.value|default:'' }}" required />
+      <input type="text" name="address" placeholder="Dirección" value="{{ form.address.value|default:'' }}" required />
+      <input type="text" name="city" placeholder="Ciudad" value="{{ form.city.value|default:'' }}" required />
+      <input type="text" name="postal_code" placeholder="Código postal" value="{{ form.postal_code.value|default:'' }}" required />
+      <input type="password" name="password" placeholder="Contraseña" required />
+      <input type="password" name="password2" placeholder="Repetir contraseña" required />
+
+      {% if form.errors %}
+        <ul class="messages">
+          {% for field, errors in form.errors.items %}
+            {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <button type="submit" class="btn-register">Crear cuenta</button>
+    </form>
+
+    <div class="login-link">
+      <span>¿Ya tienes cuenta? <a href="{% url 'login' %}">Iniciar sesión</a></span>
     </div>
   </div>
+</div>
 {% endblock %}

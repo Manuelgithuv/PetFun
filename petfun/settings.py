@@ -51,6 +51,8 @@ DEBUG = os.getenv("DEBUG", "1").lower() in ("1", "true", "yes", "y", "on")
 
 ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "").split(",") if h.strip()] or []
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Application definition
 

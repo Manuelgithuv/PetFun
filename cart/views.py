@@ -20,6 +20,7 @@ def _cart_payload(cart):
             'quantity': it.quantity,
             'unit_price': f"{it.unit_price:.2f}",
             'subtotal': f"{it.subtotal:.2f}",
+            'image_url': it.product.image.url, # <-- nueva línea
         })
     return {
         'total': f"{cart.total:.2f}",

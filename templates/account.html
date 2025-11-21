@@ -1,125 +1,152 @@
 {% extends "base.html" %}
 {% block title %}Mi cuenta | PetFun{% endblock %}
+{% load static %}
 {% block content %}
-  <style>
-    /* Botones naranjas, consistentes con home/catalog */
-    .btn-primary{padding:12px 20px;background:#f9a825;color:#fff;border:0;border-radius:10px;font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,.25);cursor:pointer;transition:transform .08s ease, box-shadow .2s ease, background .2s ease}
-    .btn-primary:hover{background:#ffbf3f;box-shadow:0 4px 10px rgba(0,0,0,.3);transform:translateY(-1px)}
-    .btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none}
+<style>
+  .account-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 16px;
+    min-height: 80vh;
+  }
 
-    /* Botón rojo (poco más rojo que #c44) */
-    .btn-danger{padding:12px 20px;background:#d64545;color:#fff;border:0;border-radius:10px;font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,.25);cursor:pointer;transition:transform .08s ease, box-shadow .2s ease, background .2s ease}
-    .btn-danger:hover{background:#e75a5a;box-shadow:0 4px 10px rgba(0,0,0,.3);transform:translateY(-1px)}
-    .btn-danger:disabled{opacity:.6;cursor:not-allowed;transform:none}
-  </style>
-  <div class="row">
-    <div class="card grow" style="max-width:720px;margin:0 auto">
-      <h2>Mi cuenta</h2>
+  .account-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 32px 24px;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
 
-      <!-- Perfil -->
-      <form method="post" action="{% url 'account' %}" style="margin-bottom:16px">
-        {% csrf_token %}
-        <input type="hidden" name="submit_profile" value="1" />
-        <div class="row">
-          <div class="grow">
-            <label>Email</label>
-            <input type="text" value="{{ request.user.email }}" disabled />
-          </div>
-        </div>
-        <div class="row">
-          <div class="grow">
-            <label>Nombre</label>
-            <input type="text" name="first_name" value="{{ form.first_name.value|default:request.user.first_name }}" />
-          </div>
-          <div class="grow">
-            <label>Apellidos</label>
-            <input type="text" name="last_name" value="{{ form.last_name.value|default:request.user.last_name }}" />
-          </div>
-        </div>
-        <div class="row">
-          <div class="grow">
-            <label>Teléfono</label>
-            <input type="text" name="phone" value="{{ form.phone.value|default:request.user.phone }}" />
-          </div>
-        </div>
-        <div class="row">
-          <div class="grow">
-            <label>Dirección</label>
-            <input type="text" name="address" value="{{ form.address.value|default:request.user.address }}" />
-          </div>
-        </div>
-        <div class="row">
-          <div class="grow">
-            <label>Ciudad</label>
-            <input type="text" name="city" value="{{ form.city.value|default:request.user.city }}" />
-          </div>
-          <div class="grow">
-            <label>Código postal</label>
-            <input type="text" name="postal_code" value="{{ form.postal_code.value|default:request.user.postal_code }}" />
-          </div>
-        </div>
+  .account-card h2, .account-card h3 {
+    color: #111;
+    margin: 0 0 16px 0;
+  }
 
-        {% if form.errors %}
-          <ul class="messages">
-            {% for field, errors in form.errors.items %}
-              {% for e in errors %}<li class="error">{{ e }}</li>{% endfor %}
-            {% endfor %}
-          </ul>
-        {% endif %}
+  .account-card input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    margin-bottom: 16px;
+    box-sizing: border-box;
+  }
 
-        <button type="submit" class="btn-primary">Guardar cambios</button>
-      </form>
+  .account-card input:last-of-type {
+    margin-bottom: 24px; /* espacio antes del botón */
+  }
 
-      <!-- Cambiar contraseña -->
-      <div class="card" style="margin-top:16px">
-        <h3>Cambiar contraseña</h3>
-        <form method="post" action="{% url 'account' %}">
-          {% csrf_token %}
-          <input type="hidden" name="submit_password" value="1" />
-          <div class="row">
-            <div class="grow">
-              <label>Contraseña actual</label>
-              <input type="password" name="old_password" />
-            </div>
-          </div>
-          <div class="row">
-            <div class="grow">
-              <label>Nueva contraseña</label>
-              <input type="password" name="new_password1" />
-            </div>
-            <div class="grow">
-              <label>Confirmar nueva contraseña</label>
-              <input type="password" name="new_password2" />
-            </div>
-          </div>
+  .btn-primary {
+    padding: 12px 20px;
+    background: #f9a825;
+    color: #fff;
+    border: 0;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+  }
 
-          {% if pwd_form.errors %}
-            <ul class="messages">
-              {% for field, errors in pwd_form.errors.items %}
-                {% for e in errors %}<li class="error">{{ e }}</li>{% endfor %}
-              {% endfor %}
-            </ul>
-          {% endif %}
+  .btn-primary:hover {
+    background: #ffbf3f;
+  }
 
-          <button type="submit" class="btn-primary">Actualizar contraseña</button>
-        </form>
-      </div>
+  .btn-danger {
+    padding: 12px 20px;
+    background: #d64545;
+    color: #fff;
+    border: 0;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+  }
 
-      <!-- Eliminar cuenta (requiere contraseña) -->
-      <div class="card" style="margin-top:16px">
-        <h3>Eliminar cuenta</h3>
-        <p style="color:#9aa0a6">Esta acción es irreversible. Escribe tu contraseña para confirmar.</p>
-        <form method="post" action="{% url 'account_delete' %}">
-          {% csrf_token %}
-          <div class="row">
-            <div class="grow">
-              <label>Contraseña</label>
-              <input type="password" name="password" />
-            </div>
-          </div>
-          <button type="submit" class="btn-danger">Eliminar cuenta</button>
-        </form>
-      </div>
-    </div>
+  .btn-danger:hover {
+    background: #e75a5a;
+  }
+
+  .messages {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 16px 0;
+    color: #b71c1c;
+    font-weight: 600;
+  }
+
+  .section-divider {
+    height: 1px;
+    background: #eee;
+    margin: 32px 0;
+  }
+</style>
+
+<div class="account-container">
+  <div class="account-card">
+    <!-- Perfil -->
+    <h2>Mi perfil</h2>
+    <form method="post" action="{% url 'account' %}">
+      {% csrf_token %}
+      <input type="hidden" name="submit_profile" value="1" />
+      
+      <input type="text" value="{{ request.user.email }}" disabled placeholder="Correo electrónico" />
+      <input type="text" name="first_name" value="{{ form.first_name.value|default:request.user.first_name }}" placeholder="Nombre" />
+      <input type="text" name="last_name" value="{{ form.last_name.value|default:request.user.last_name }}" placeholder="Apellidos" />
+      <input type="text" name="phone" value="{{ form.phone.value|default:request.user.phone }}" placeholder="Teléfono" />
+      <input type="text" name="address" value="{{ form.address.value|default:request.user.address }}" placeholder="Dirección" />
+      <input type="text" name="city" value="{{ form.city.value|default:request.user.city }}" placeholder="Ciudad" />
+      <input type="text" name="postal_code" value="{{ form.postal_code.value|default:request.user.postal_code }}" placeholder="Código postal" />
+
+      {% if form.errors %}
+        <ul class="messages">
+          {% for field, errors in form.errors.items %}
+            {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <button type="submit" class="btn-primary">Guardar cambios</button>
+    </form>
+
+    <div class="section-divider"></div>
+
+    <!-- Cambiar contraseña -->
+    <h3>Cambiar contraseña</h3>
+    <form method="post" action="{% url 'account' %}">
+      {% csrf_token %}
+      <input type="hidden" name="submit_password" value="1" />
+
+      <input type="password" name="old_password" placeholder="Contraseña actual" />
+      <input type="password" name="new_password1" placeholder="Nueva contraseña" />
+      <input type="password" name="new_password2" placeholder="Confirmar nueva contraseña" />
+
+      {% if pwd_form.errors %}
+        <ul class="messages">
+          {% for field, errors in pwd_form.errors.items %}
+            {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <button type="submit" class="btn-primary">Actualizar contraseña</button>
+    </form>
+
+    <div class="section-divider"></div>
+
+    <!-- Eliminar cuenta -->
+    <h3>Eliminar cuenta</h3>
+    <p style="color:#9aa0a6">Esta acción es irreversible. Escribe tu contraseña para confirmar.</p>
+    <form method="post" action="{% url 'account_delete' %}">
+      {% csrf_token %}
+      <input type="password" name="password" placeholder="Contraseña" />
+      <button type="submit" class="btn-danger">Eliminar cuenta</button>
+    </form>
   </div>
+</div>
 {% endblock %}
