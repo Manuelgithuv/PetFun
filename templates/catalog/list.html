@@ -222,7 +222,6 @@
   </div>
   <div class="price">Precio: {{ p.price }} €</div>
   <div class="actions">
-    <input class="qty-input" type="number" min="1" value="1" {% if p.stock == 0 %}disabled{% endif %} />
     <button type="button" class="btn-add" data-product-id="{{ p.id }}" {% if p.stock == 0 %}disabled{% endif %}>Añadir</button>
   </div>
 </div>
@@ -234,6 +233,42 @@
   {% endfor %}
 
 </div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.btn-add').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const productId = btn.dataset.productId;
+      const card = btn.closest('.product-card');
+      const qtyInput = card.querySelector('.qty-input');
+      let quantity = parseInt(qtyInput.value);
+
+      if(isNaN(quantity) || quantity < 1) quantity = 1;
+
+      try {
+        const res = await fetch("{% url 'cart:add' %}", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+          },
+          body: JSON.stringify({ product_id: productId, quantity: quantity })
+        });
+
+        if(!res.ok) throw new Error('No se pudo añadir el producto');
+
+        const data = await res.json();
+        alert(`${quantity} × ${data.product_name} añadido al carrito.`);
+      } catch(err) {
+        console.error(err);
+        alert('Error al añadir el producto al carrito.');
+      }
+    });
+  });
+});
+</script>
+
 
 {% endblock %}
 
