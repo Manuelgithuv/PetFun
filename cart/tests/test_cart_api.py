@@ -22,6 +22,7 @@ class CartApiTests(TestCase):
 			stock=3,
 			category=self.sub,
 			image_url="https://example.com/mordedor1.jpg",
+			image="products/CAT-CAN-002_fNtjUeZ.jpg",
 			sku="",
 		)
 

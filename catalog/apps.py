@@ -50,15 +50,15 @@ def _seed_catalog_if_empty(sender, **kwargs):
         gato = 'Juguetes para Gato'
 
         targets = {
-            'DOG-MOR-001': (perro, 'Mordedores', 'Mordedor resistente', Decimal('7.99'), 25, 'PetMaster'),
-            'DOG-MOR-002': (perro, 'Mordedores', 'Mordedor con sabor', Decimal('8.50'), 18, 'CaninePlay'),
-            'DOG-PEL-001': (perro, 'Pelotas', 'Pelota rebotadora', Decimal('5.49'), 40, 'CaninePlay'),
-            'DOG-INT-001': (perro, 'De inteligencia', 'Puzzle canino nivel 1', Decimal('19.90'), 10, 'PetMaster'),
-            'DOG-PELUC-001': (perro, 'Peluches', 'Peluchito con sonido', Decimal('12.00'), 12, 'CaninePlay'),
-            'CAT-RAT-001': (gato, 'Ratones de juguete', 'Ratón de fieltro', Decimal('3.99'), 50, 'FelineJoy'),
-            'CAT-CAN-001': (gato, 'Caña', 'Caña con plumas', Decimal('6.99'), 35, 'CatCraft'),
-            'CAT-HIER-001': (gato, 'Hierba gatera', 'Hierba gatera premium', Decimal('4.50'), 60, 'FelineJoy'),
-            'CAT-TUN-001': (gato, 'Túneles', 'Túnel plegable', Decimal('14.99'), 14, 'CatCraft'),
+            'DOG-MOR-001': (perro, 'Mordedores', 'Mordedor resistente', Decimal('7.99'), 25, 'PetMaster', 'products/DOG-MOR-001_2gnIOIS.jpg'),
+            'DOG-MOR-002': (perro, 'Mordedores', 'Mordedor con sabor', Decimal('8.50'), 18, 'CaninePlay', 'products/DOG-MOR-002_gNmkFHc.jpg'),
+            'DOG-PEL-001': (perro, 'Pelotas', 'Pelota rebotadora', Decimal('5.49'), 40, 'CaninePlay', 'products/DOG-PEL-001_WSaseIA.jpg'),
+            'DOG-INT-001': (perro, 'De inteligencia', 'Puzzle canino nivel 1', Decimal('19.90'), 10, 'PetMaster', 'products/DOG-INT-001_vQfClsY.jpg'),
+            'DOG-PELUC-001': (perro, 'Peluches', 'Peluchito con sonido', Decimal('12.00'), 12, 'CaninePlay', 'products/DOG-PELUC-001_SEs34A9.jpg'),
+            'CAT-RAT-001': (gato, 'Ratones de juguete', 'Ratón de fieltro', Decimal('3.99'), 50, 'FelineJoy', 'products/CAT-RAT-001_fS8VaWh.jpg'),
+            'CAT-CAN-001': (gato, 'Caña', 'Caña con plumas', Decimal('6.99'), 35, 'CatCraft', 'products/CAT-CAN-001_hMHtrHT.jpg'),
+            'CAT-HIER-001': (gato, 'Hierba gatera', 'Hierba gatera premium', Decimal('4.50'), 60, 'FelineJoy', 'products/CAT-HIER-001_kbOnYs7.jpg'),
+            'CAT-TUN-001': (gato, 'Túneles', 'Túnel plegable', Decimal('14.99'), 14, 'CatCraft', 'products/CAT-TUN-001_ZqkzGvV.jpg'),
         }
         for sku, (parent_name, sub_name, name, price, stock, mfr_name) in targets.items():
             cat = subcat(sub_name, parent_name)
@@ -84,17 +84,17 @@ def _seed_catalog_if_empty(sender, **kwargs):
         m_fel = mfr_map['FelineJoy']
         m_cat = mfr_map['CatCraft']
         rows = [
-            ('DOG-MOR-003', perro, 'Mordedores', 'Mordedor dental', Decimal('6.50'), 30, m_pet),
-            ('DOG-MOR-004', perro, 'Mordedores', 'Mordedor cuerda', Decimal('7.20'), 22, m_can),
-            ('DOG-PEL-002', perro, 'Pelotas', 'Pelota luminosa', Decimal('6.90'), 28, m_can),
-            ('DOG-PEL-003', perro, 'Pelotas', 'Pelota resistente XL', Decimal('8.90'), 15, m_pet),
-            ('DOG-INT-002', perro, 'De inteligencia', 'Puzzle canino nivel 2', Decimal('24.90'), 8, m_pet),
-            ('DOG-PELUC-002', perro, 'Peluches', 'Peluche sin relleno', Decimal('10.50'), 18, m_can),
-            ('CAT-RAT-002', gato, 'Ratones de juguete', 'Ratón con catnip', Decimal('4.20'), 45, m_fel),
-            ('CAT-RAT-003', gato, 'Ratones de juguete', 'Set de 3 ratones', Decimal('6.80'), 32, m_cat),
-            ('CAT-CAN-002', gato, 'Caña', 'Caña telescópica', Decimal('7.99'), 20, m_cat),
-            ('CAT-HIER-002', gato, 'Hierba gatera', 'Spray catnip', Decimal('5.20'), 26, m_fel),
-            ('CAT-TUN-002', gato, 'Túneles', 'Túnel con ventana', Decimal('16.50'), 12, m_cat),
+            ('DOG-MOR-003', perro, 'Mordedores', 'Mordedor dental', Decimal('6.50'), 30, mfr_map['PetMaster'], 'products/DOG-MOR-003_dTaEAA3.jpg'),
+            ('DOG-MOR-004', perro, 'Mordedores', 'Mordedor cuerda', Decimal('7.20'), 22, mfr_map['CaninePlay'], 'products/DOG-MOR-004_9UbOVDm.jpg'),
+            ('DOG-PEL-002', perro, 'Pelotas', 'Pelota luminosa', Decimal('6.90'), 28, mfr_map['CaninePlay'], 'products/DOG-PEL-002_sSzibFe.jpg'),
+            ('DOG-PEL-003', perro, 'Pelotas', 'Pelota resistente XL', Decimal('8.90'), 15, mfr_map['PetMaster'], 'products/DOG-PEL-003_o1cDKy6.jpg'),
+            ('DOG-INT-002', perro, 'De inteligencia', 'Puzzle canino nivel 2', Decimal('24.90'), 8, mfr_map['PetMaster'], 'products/DOG-INT-002_9Eok1Jp.jpg'),
+            ('DOG-PELUC-002', perro, 'Peluches', 'Peluche sin relleno', Decimal('10.50'), 18, mfr_map['CaninePlay'], 'products/DOG-PELUC-002_3DEegEj.jpg'),
+            ('CAT-RAT-002', gato, 'Ratones de juguete', 'Ratón con catnip', Decimal('4.20'), 45, mfr_map['FelineJoy'], 'products/CAT-RAT-002_wCRjoK1.jpg'),
+            ('CAT-RAT-003', gato, 'Ratones de juguete', 'Set de 3 ratones', Decimal('6.80'), 32, mfr_map['CatCraft'], 'products/CAT-RAT-003_GvXnNfA.jpg'),
+            ('CAT-CAN-002', gato, 'Caña', 'Caña telescópica', Decimal('7.99'), 20, mfr_map['CatCraft'], 'products/CAT-CAN-002_fNtjUeZ.jpg'),
+            ('CAT-HIER-002', gato, 'Hierba gatera', 'Spray catnip', Decimal('5.20'), 26, mfr_map['FelineJoy'], 'products/CAT-HIER-002_urKuCRL.jpg'),
+            ('CAT-TUN-002', gato, 'Túneles', 'Túnel con ventana', Decimal('16.50'), 12, mfr_map['CatCraft'], 'products/CAT-TUN-002_qpOVxUY.jpg'),
         ]
         for sku, parent_name, sub_name, name, price, stock, mfr in rows:
             cat = subcat(sub_name, parent_name)

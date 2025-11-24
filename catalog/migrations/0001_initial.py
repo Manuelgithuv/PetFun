@@ -5,30 +5,16 @@ import django.db.models.deletion
 from django.db import migrations, models
 from decimal import Decimal
 
-
-# Functions from the following migrations manually copied below and referenced locally:
-# - catalog.migrations.0002_seed_categories
-# - catalog.migrations.0003_seed_manufacturers_products
-# - catalog.migrations.0004_seed_more_products
-
-
 def seed_categories(apps, schema_editor):
     Category = apps.get_model('catalog', 'Category')
-
     structure = {
-        'Juguetes para Perro': [
-            'Mordedores', 'Pelotas', 'De inteligencia', 'Peluches'
-        ],
-        'Juguetes para Gato': [
-            'Ratones de juguete', 'Caña', 'Hierba gatera', 'Túneles'
-        ],
+        'Juguetes para Perro': ['Mordedores', 'Pelotas', 'De inteligencia', 'Peluches'],
+        'Juguetes para Gato': ['Ratones de juguete', 'Caña', 'Hierba gatera', 'Túneles'],
     }
-
     for parent_name, children in structure.items():
         parent, _ = Category.objects.get_or_create(name=parent_name, defaults={})
         for child in children:
             Category.objects.get_or_create(name=child, parent=parent, defaults={})
-
 
 def unseed_categories(apps, schema_editor):
     Category = apps.get_model('catalog', 'Category')
@@ -45,9 +31,7 @@ def seed_manufacturers_and_products(apps, schema_editor):
     Product = apps.get_model('catalog', 'Product')
 
     # Manufacturers
-    mfr_names = [
-        'PetMaster', 'FelineJoy', 'CaninePlay', 'CatCraft'
-    ]
+    mfr_names = ['PetMaster', 'FelineJoy', 'CaninePlay', 'CatCraft']
     mfr_map = {}
     for name in mfr_names:
         m, _ = Manufacturer.objects.get_or_create(name=name, defaults={})
@@ -56,28 +40,26 @@ def seed_manufacturers_and_products(apps, schema_editor):
     def subcat(name, parent):
         return Category.objects.filter(name=name, parent__name=parent).first()
 
-    # Target subcategories
     perro = 'Juguetes para Perro'
     gato = 'Juguetes para Gato'
+
     targets = {
-        'DOG-MOR-001': (perro, 'Mordedores', 'Mordedor resistente', Decimal('7.99'), 25, 'PetMaster'),
-        'DOG-MOR-002': (perro, 'Mordedores', 'Mordedor con sabor', Decimal('8.50'), 18, 'CaninePlay'),
-        'DOG-PEL-001': (perro, 'Pelotas', 'Pelota rebotadora', Decimal('5.49'), 40, 'CaninePlay'),
-        'DOG-INT-001': (perro, 'De inteligencia', 'Puzzle canino nivel 1', Decimal('19.90'), 10, 'PetMaster'),
-        'DOG-PELUC-001': (perro, 'Peluches', 'Peluchito con sonido', Decimal('12.00'), 12, 'CaninePlay'),
-        'CAT-RAT-001': (gato, 'Ratones de juguete', 'Ratón de fieltro', Decimal('3.99'), 50, 'FelineJoy'),
-        'CAT-CAN-001': (gato, 'Caña', 'Caña con plumas', Decimal('6.99'), 35, 'CatCraft'),
-        'CAT-HIER-001': (gato, 'Hierba gatera', 'Hierba gatera premium', Decimal('4.50'), 60, 'FelineJoy'),
-        'CAT-TUN-001': (gato, 'Túneles', 'Túnel plegable', Decimal('14.99'), 14, 'CatCraft'),
+        'DOG-MOR-001': (perro, 'Mordedores', 'Mordedor resistente', Decimal('7.99'), 25, 'PetMaster', 'products/DOG-MOR-001_2gnIOIS.jpg'),
+        'DOG-MOR-002': (perro, 'Mordedores', 'Mordedor con sabor', Decimal('8.50'), 18, 'CaninePlay', 'products/DOG-MOR-002_gNmkFHc.jpg'),
+        'DOG-PEL-001': (perro, 'Pelotas', 'Pelota rebotadora', Decimal('5.49'), 40, 'CaninePlay', 'products/DOG-PEL-001_WSaseIA.jpg'),
+        'DOG-INT-001': (perro, 'De inteligencia', 'Puzzle canino nivel 1', Decimal('19.90'), 10, 'PetMaster', 'products/DOG-INT-001_vQfClsY.jpg'),
+        'DOG-PELUC-001': (perro, 'Peluches', 'Peluchito con sonido', Decimal('12.00'), 12, 'CaninePlay', 'products/DOG-PELUC-001_SEs34A9.jpg'),
+        'CAT-RAT-001': (gato, 'Ratones de juguete', 'Ratón de fieltro', Decimal('3.99'), 50, 'FelineJoy', 'products/CAT-RAT-001_fS8VaWh.jpg'),
+        'CAT-CAN-001': (gato, 'Caña', 'Caña con plumas', Decimal('6.99'), 35, 'CatCraft', 'products/CAT-CAN-001_hMHtrHT.jpg'),
+        'CAT-HIER-001': (gato, 'Hierba gatera', 'Hierba gatera premium', Decimal('4.50'), 60, 'FelineJoy', 'products/CAT-HIER-001_kbOnYs7.jpg'),
+        'CAT-TUN-001': (gato, 'Túneles', 'Túnel plegable', Decimal('14.99'), 14, 'CatCraft', 'products/CAT-TUN-001_ZqkzGvV.jpg'),
     }
 
-    for sku, (parent_name, sub_name, name, price, stock, mfr_name) in targets.items():
+    for sku, (parent_name, sub_name, name, price, stock, mfr_name, img_path) in targets.items():
         cat = subcat(sub_name, parent_name)
         if not cat:
             continue
         mfr = mfr_map.get(mfr_name)
-        # unique image per product
-        img = f"https://placehold.co/600x400?text={sku}"
         Product.objects.get_or_create(
             sku=sku,
             defaults=dict(
@@ -88,21 +70,19 @@ def seed_manufacturers_and_products(apps, schema_editor):
                 stock=stock,
                 category=cat,
                 manufacturer=mfr,
-                image_url=img,
+                image_url=f"https://placehold.co/600x400?text={sku}",
+                image=img_path,  # Aquí se asigna la imagen real
             )
         )
-
 
 def unseed_manufacturers_and_products(apps, schema_editor):
     Manufacturer = apps.get_model('catalog', 'Manufacturer')
     Product = apps.get_model('catalog', 'Product')
-
     skus = [
         'DOG-MOR-001','DOG-MOR-002','DOG-PEL-001','DOG-INT-001','DOG-PELUC-001',
         'CAT-RAT-001','CAT-CAN-001','CAT-HIER-001','CAT-TUN-001',
     ]
     Product.objects.filter(sku__in=skus).delete()
-    # Optionally remove manufacturers if unused
     for name in ['PetMaster','FelineJoy','CaninePlay','CatCraft']:
         m = Manufacturer.objects.filter(name=name).first()
         if m and not m.products.exists():
@@ -117,37 +97,29 @@ def seed_more_products(apps, schema_editor):
     def subcat(name, parent):
         return Category.objects.filter(name=name, parent__name=parent).first()
 
-    m_pet, _ = Manufacturer.objects.get_or_create(name='PetMaster', defaults={})
-    m_can, _ = Manufacturer.objects.get_or_create(name='CaninePlay', defaults={})
-    m_fel, _ = Manufacturer.objects.get_or_create(name='FelineJoy', defaults={})
-    m_cat, _ = Manufacturer.objects.get_or_create(name='CatCraft', defaults={})
+    m_pet = Manufacturer.objects.get(name='PetMaster')
+    m_can = Manufacturer.objects.get(name='CaninePlay')
+    m_fel = Manufacturer.objects.get(name='FelineJoy')
+    m_cat = Manufacturer.objects.get(name='CatCraft')
 
     perro = 'Juguetes para Perro'
     gato = 'Juguetes para Gato'
 
     rows = [
-        # Perro - Mordedores (2 extra)
-        ('DOG-MOR-003', perro, 'Mordedores', 'Mordedor dental', Decimal('6.50'), 30, m_pet),
-        ('DOG-MOR-004', perro, 'Mordedores', 'Mordedor cuerda', Decimal('7.20'), 22, m_can),
-        # Perro - Pelotas (2 extra)
-        ('DOG-PEL-002', perro, 'Pelotas', 'Pelota luminosa', Decimal('6.90'), 28, m_can),
-        ('DOG-PEL-003', perro, 'Pelotas', 'Pelota resistente XL', Decimal('8.90'), 15, m_pet),
-        # Perro - De inteligencia (1 extra)
-        ('DOG-INT-002', perro, 'De inteligencia', 'Puzzle canino nivel 2', Decimal('24.90'), 8, m_pet),
-        # Perro - Peluches (1 extra)
-        ('DOG-PELUC-002', perro, 'Peluches', 'Peluche sin relleno', Decimal('10.50'), 18, m_can),
-        # Gato - Ratones (2 extra)
-        ('CAT-RAT-002', gato, 'Ratones de juguete', 'Ratón con catnip', Decimal('4.20'), 45, m_fel),
-        ('CAT-RAT-003', gato, 'Ratones de juguete', 'Set de 3 ratones', Decimal('6.80'), 32, m_cat),
-        # Gato - Caña (1 extra)
-        ('CAT-CAN-002', gato, 'Caña', 'Caña telescópica', Decimal('7.99'), 20, m_cat),
-        # Gato - Hierba gatera (1 extra)
-        ('CAT-HIER-002', gato, 'Hierba gatera', 'Spray catnip', Decimal('5.20'), 26, m_fel),
-        # Gato - Túneles (1 extra)
-        ('CAT-TUN-002', gato, 'Túneles', 'Túnel con ventana', Decimal('16.50'), 12, m_cat),
+        ('DOG-MOR-003', perro, 'Mordedores', 'Mordedor dental', Decimal('6.50'), 30, m_pet, 'products/DOG-MOR-003_dTaEAA3.jpg'),
+        ('DOG-MOR-004', perro, 'Mordedores', 'Mordedor cuerda', Decimal('7.20'), 22, m_can, 'products/DOG-MOR-004_9UbOVDm.jpg'),
+        ('DOG-PEL-002', perro, 'Pelotas', 'Pelota luminosa', Decimal('6.90'), 28, m_can, 'products/DOG-PEL-002_sSzibFe.jpg'),
+        ('DOG-PEL-003', perro, 'Pelotas', 'Pelota resistente XL', Decimal('8.90'), 15, m_pet, 'products/DOG-PEL-003_o1cDKy6.jpg'),
+        ('DOG-INT-002', perro, 'De inteligencia', 'Puzzle canino nivel 2', Decimal('24.90'), 8, m_pet, 'products/DOG-INT-002_9Eok1Jp.jpg'),
+        ('DOG-PELUC-002', perro, 'Peluches', 'Peluche sin relleno', Decimal('10.50'), 18, m_can, 'products/DOG-PELUC-002_3DEegEj.jpg'),
+        ('CAT-RAT-002', gato, 'Ratones de juguete', 'Ratón con catnip', Decimal('4.20'), 45, m_fel, 'products/CAT-RAT-002_wCRjoK1.jpg'),
+        ('CAT-RAT-003', gato, 'Ratones de juguete', 'Set de 3 ratones', Decimal('6.80'), 32, m_cat, 'products/CAT-RAT-003_GvXnNfA.jpg'),
+        ('CAT-CAN-002', gato, 'Caña', 'Caña telescópica', Decimal('7.99'), 20, m_cat, 'products/CAT-CAN-002_fNtjUeZ.jpg'),
+        ('CAT-HIER-002', gato, 'Hierba gatera', 'Spray catnip', Decimal('5.20'), 26, m_fel, 'products/CAT-HIER-002_urKuCRL.jpg'),
+        ('CAT-TUN-002', gato, 'Túneles', 'Túnel con ventana', Decimal('16.50'), 12, m_cat, 'products/CAT-TUN-002_qpOVxUY.jpg'),
     ]
 
-    for sku, parent_name, sub_name, name, price, stock, mfr in rows:
+    for sku, parent_name, sub_name, name, price, stock, mfr, img_path in rows:
         cat = subcat(sub_name, parent_name)
         if not cat:
             continue
@@ -162,9 +134,9 @@ def seed_more_products(apps, schema_editor):
                 category=cat,
                 manufacturer=mfr,
                 image_url=f"https://placehold.co/600x400?text={sku}",
+                image=img_path,  # Imagen real
             )
         )
-
 
 def unseed_more_products(apps, schema_editor):
     Product = apps.get_model('catalog', 'Product')
@@ -179,8 +151,7 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
@@ -190,10 +161,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=150, unique=True)),
                 ('description', models.TextField(blank=True)),
             ],
-            options={
-                'verbose_name': 'fabricante',
-                'verbose_name_plural': 'fabricantes',
-            },
+            options={'verbose_name': 'fabricante', 'verbose_name_plural': 'fabricantes'},
         ),
         migrations.CreateModel(
             name='Category',
@@ -203,10 +171,7 @@ class Migration(migrations.Migration):
                 ('image_url', models.URLField(blank=True, null=True)),
                 ('parent', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='children', to='catalog.category')),
             ],
-            options={
-                'verbose_name': 'categoría',
-                'verbose_name_plural': 'categorías',
-            },
+            options={'verbose_name': 'categoría', 'verbose_name_plural': 'categorías'},
         ),
         migrations.CreateModel(
             name='Product',
@@ -219,165 +184,16 @@ class Migration(migrations.Migration):
                 ('price', models.DecimalField(decimal_places=2, max_digits=10, validators=[django.core.validators.MinValueValidator(0)])),
                 ('stock', models.PositiveIntegerField(validators=[django.core.validators.MinValueValidator(0)])),
                 ('image_url', models.URLField(unique=True)),
+                ('image', models.ImageField(upload_to='products/', blank=True, null=True)),  # agregado
                 ('status', models.CharField(choices=[('disponible', 'Disponible'), ('agotado', 'Agotado')], db_index=True, default='disponible', max_length=12)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('category', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='products', to='catalog.category')),
                 ('manufacturer', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='products', to='catalog.manufacturer')),
             ],
-            options={
-                'verbose_name': 'producto',
-                'verbose_name_plural': 'productos',
-                'constraints': [models.CheckConstraint(condition=models.Q(('stock__gte', 0)), name='product_stock_gte_0')],
-            },
+            options={'verbose_name': 'producto', 'verbose_name_plural': 'productos', 'constraints': [models.CheckConstraint(check=models.Q(('stock__gte', 0)), name='product_stock_gte_0')]},
         ),
-        migrations.RunPython(
-            code=seed_categories,
-            reverse_code=unseed_categories,
-        ),
-        migrations.RunPython(
-            code=seed_manufacturers_and_products,
-            reverse_code=unseed_manufacturers_and_products,
-        ),
-        migrations.RunPython(
-            code=seed_more_products,
-            reverse_code=unseed_more_products,
-        ),
-    ]
-# Generated by Django 5.2.8 on 2025-11-12 10:48
-
-import django.core.validators
-import django.db.models.deletion
-from django.db import migrations, models
-
-
-class Migration(migrations.Migration):
-
-    initial = True
-
-    dependencies = []
-
-    operations = [
-        migrations.CreateModel(
-            name="Manufacturer",
-            fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                ("name", models.CharField(max_length=150, unique=True)),
-                ("description", models.TextField(blank=True)),
-            ],
-            options={
-                "verbose_name": "fabricante",
-                "verbose_name_plural": "fabricantes",
-            },
-        ),
-        migrations.CreateModel(
-            name="Category",
-            fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                ("name", models.CharField(max_length=150, unique=True)),
-                ("image_url", models.URLField(blank=True, null=True)),
-                (
-                    "parent",
-                    models.ForeignKey(
-                        blank=True,
-                        null=True,
-                        on_delete=django.db.models.deletion.CASCADE,
-                        related_name="children",
-                        to="catalog.category",
-                    ),
-                ),
-            ],
-            options={
-                "verbose_name": "categoría",
-                "verbose_name_plural": "categorías",
-            },
-        ),
-        migrations.CreateModel(
-            name="Product",
-            fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                ("sku", models.CharField(db_index=True, max_length=32, unique=True)),
-                ("name", models.CharField(max_length=200)),
-                ("short_description", models.CharField(blank=True, max_length=300)),
-                ("description", models.TextField()),
-                (
-                    "price",
-                    models.DecimalField(
-                        decimal_places=2,
-                        max_digits=10,
-                        validators=[django.core.validators.MinValueValidator(0)],
-                    ),
-                ),
-                (
-                    "stock",
-                    models.PositiveIntegerField(
-                        validators=[django.core.validators.MinValueValidator(0)]
-                    ),
-                ),
-                ("image_url", models.URLField(unique=True)),
-                (
-                    "status",
-                    models.CharField(
-                        choices=[("disponible", "Disponible"), ("agotado", "Agotado")],
-                        db_index=True,
-                        default="disponible",
-                        max_length=12,
-                    ),
-                ),
-                ("created_at", models.DateTimeField(auto_now_add=True)),
-                ("updated_at", models.DateTimeField(auto_now=True)),
-                (
-                    "category",
-                    models.ForeignKey(
-                        on_delete=django.db.models.deletion.PROTECT,
-                        related_name="products",
-                        to="catalog.category",
-                    ),
-                ),
-                (
-                    "manufacturer",
-                    models.ForeignKey(
-                        blank=True,
-                        null=True,
-                        on_delete=django.db.models.deletion.SET_NULL,
-                        related_name="products",
-                        to="catalog.manufacturer",
-                    ),
-                ),
-            ],
-            options={
-                "verbose_name": "producto",
-                "verbose_name_plural": "productos",
-                "constraints": [
-                    models.CheckConstraint(
-                        condition=models.Q(("stock__gte", 0)),
-                        name="product_stock_gte_0",
-                    )
-                ],
-            },
-        ),
+        migrations.RunPython(code=seed_categories, reverse_code=unseed_categories),
+        migrations.RunPython(code=seed_manufacturers_and_products, reverse_code=unseed_manufacturers_and_products),
+        migrations.RunPython(code=seed_more_products, reverse_code=unseed_more_products),
     ]

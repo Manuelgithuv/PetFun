@@ -35,6 +35,7 @@ class CartApiToCheckoutIntegrationTest(TestCase):
             stock=10,
             category=cat,
             image_url="http://example.com/e2e.png",
+            image="products/CAT-CAN-002_fNtjUeZ.jpg"
         )
 
     def test_add_via_api_then_full_checkout_with_stripe_mock(self):

@@ -83,17 +83,21 @@
     <h2>Iniciar sesión</h2>
 
     <form method="post" action="{% url 'login' %}{% if next %}?next={{ next|urlencode }}{% endif %}">
-      {% csrf_token %}
+  {% csrf_token %}
 
-      <input id="id_email" name="email" type="text" placeholder="Correo electrónico" required />
-      <input id="id_password" name="password" type="password" placeholder="Contraseña" required />
+  <input id="id_email" name="email" type="text" placeholder="Correo electrónico" required />
+  <input id="id_password" name="password" type="password" placeholder="Contraseña" required />
 
-      {% if next %}
-        <input type="hidden" name="next" value="{{ next }}" />
-      {% endif %}
+  {% if error %}
+    <p class="error" style="color:red; text-align:center;">{{ error }}</p>
+  {% endif %}
 
-      <button type="submit" class="btn-login">Iniciar sesión</button>
-    </form>
+  {% if next %}
+    <input type="hidden" name="next" value="{{ next }}" />
+  {% endif %}
+
+  <button type="submit" class="btn-login">Iniciar sesión</button>
+</form>
   </div>
 </div>
 {% endblock %}

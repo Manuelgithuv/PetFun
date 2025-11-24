@@ -23,6 +23,7 @@ class OrdersViewsMoreBranchesTests(TestCase):
             stock=5,
             category=self.cat,
             image_url="https://example.com/cama.jpg",
+            image="products/CAT-CAN-002_fNtjUeZ.jpg",
             sku="",
         )
 

@@ -22,6 +22,7 @@ class CatalogModelsTests(TestCase):
 			category=self.sub,
 			manufacturer=self.mfr,
 			image_url="https://example.com/hueso.jpg",
+			image="products/CAT-CAN-002_fNtjUeZ.jpg",
 			sku="",
 		)
 		self.assertTrue(p.sku)
@@ -42,6 +43,7 @@ class CatalogModelsTests(TestCase):
 			stock=1,
 			category=self.sub,
 			image_url="https://example.com/peluche.jpg",
+			image="products/CAT-CAN-002_fNtjUeZ.jpg",
 			sku="",
 		)
 		self.assertIn("Peluche", str(p))
@@ -64,6 +66,7 @@ class CatalogViewTests(TestCase):
 			category=self.sub1,
 			manufacturer=self.m1,
 			image_url="https://example.com/mordedor.jpg",
+			image="products/CAT-CAN-002_fNtjUeZ.jpg",
 			sku="",
 		)
 		Product.objects.create(
@@ -75,6 +78,7 @@ class CatalogViewTests(TestCase):
 			category=self.sub2,
 			manufacturer=self.m2,
 			image_url="https://example.com/pienso.jpg",
+			image="products/CAT-CAN-002_fNtjUeZ.jpg",
 			sku="",
 		)
 

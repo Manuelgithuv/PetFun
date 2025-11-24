@@ -51,6 +51,7 @@ class Product(models.Model):
 	manufacturer = models.ForeignKey(
 		'catalog.Manufacturer', on_delete=models.SET_NULL, null=True, blank=True, related_name="products"
 	)
+	image_url = models.URLField(unique=True)
 	image = models.ImageField(upload_to='products/', blank=True, null=True)
 
 	status = models.CharField(

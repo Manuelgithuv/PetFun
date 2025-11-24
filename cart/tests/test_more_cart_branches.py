@@ -22,6 +22,7 @@ class CartMoreBranchesTests(TestCase):
             stock=2,
             category=self.sub,
             image_url="https://example.com/mordedor2.jpg",
+            image="products/CAT-CAN-002_fNtjUeZ.jpg",
             sku="",
         )
 

@@ -25,6 +25,7 @@ class CheckoutFlowTests(TestCase):
 			stock=5,
 			category=self.sub,
 			image_url="https://example.com/collar.jpg",
+			image="products/CAT-CAN-002_fNtjUeZ.jpg",
 			sku="",
 		)
 

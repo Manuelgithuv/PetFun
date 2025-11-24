@@ -23,6 +23,7 @@ class OrdersModelsTests(TestCase):
             stock=10,
             category=self.cat,
             image_url="https://example.com/juguete.jpg",
+            image="products/CAT-CAN-002_fNtjUeZ.jpg",
             sku="SKU-1",
         )
 
@@ -62,6 +63,7 @@ class OrdersAppsSeedTests(TestCase):
             stock=10,
             category=self.cat,
             image_url="https://example.com/juguete.jpg",
+            image="products/CAT-CAN-002_fNtjUeZ.jpg",
             sku="SKU-2",
         )
 
@@ -84,6 +86,7 @@ class OrdersViewsErrorBranchesTests(TestCase):
             stock=10,
             category=self.cat,
             image_url="https://example.com/juguete2.jpg",
+            image="products/CAT-CAN-002_fNtjUeZ.jpg",
             sku="SKU-3",
         )
 
@@ -111,7 +114,7 @@ class OrdersViewsErrorBranchesTests(TestCase):
             "ship_country": "ES",
         })
         self.assertEqual(res.status_code, 200)
-        self.assertContains(res, "Stripe no está configurado")
+        self.assertContains(res, "Claves de Stripe no configuradas")
 
     @override_settings(STRIPE_SECRET_KEY="sk_test_dummy", STRIPE_PUBLISHABLE_KEY="pk_test_dummy")
     @patch("orders.views.stripe.PaymentIntent.retrieve")

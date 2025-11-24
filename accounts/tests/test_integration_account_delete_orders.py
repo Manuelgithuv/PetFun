@@ -33,6 +33,7 @@ class AccountDeleteOrdersIntegrationTest(TestCase):
             stock=5,
             category=cat,
             image_url="https://example.com/a-deluxe.jpg",
+            image="products/CAT-CAN-002_fNtjUeZ.jpg",
             sku="AC-DEL-1",
         )
         self.order = Order.objects.create(

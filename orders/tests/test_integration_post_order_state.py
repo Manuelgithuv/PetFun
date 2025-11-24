@@ -22,6 +22,7 @@ class PostOrderStateIntegrationTest(TestCase):
             stock=2,
             category=self.cat,
             image_url="https://example.com/snacks.jpg",
+            image="products/CAT-CAN-002_fNtjUeZ.jpg",
             sku="PO-STATE-1",
         )
 

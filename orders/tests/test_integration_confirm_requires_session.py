@@ -21,6 +21,7 @@ class ConfirmRequiresSessionIntegrationTest(TestCase):
             stock=3,
             category=self.cat,
             image_url="https://example.com/correa.jpg",
+            image="products/CAT-CAN-002_fNtjUeZ.jpg",
             sku="CONF-SESS-1",
         )
 

@@ -35,6 +35,7 @@ class CartLoginBehaviorIntegrationTest(TestCase):
             stock=10,
             category=cat,
             image_url="http://example.com/snack.png",
+            image="products/CAT-CAN-002_fNtjUeZ.jpg",
             sku="AN-LOGIN-1",
         )
 

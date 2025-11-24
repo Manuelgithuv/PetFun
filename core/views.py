@@ -23,6 +23,7 @@ def home(request):
 @require_http_methods(["GET", "POST"])
 def login_view(request):
 	"""Login using email + password, with `next` redirect support."""
+	error_msg = ""
 	if request.method == "POST":
 		email = request.POST.get("email", "").strip()
 		password = request.POST.get("password", "")
@@ -43,8 +44,9 @@ def login_view(request):
 			return redirect("home")
 		else:
 			messages.error(request, "Email o contraseña incorrectos.")
+			error_msg = "Correo o contraseña incorrectos"
 
-	ctx = {"next": request.GET.get("next", "")}
+	ctx = {"next": request.GET.get("next", ""),"error": error_msg}
 	return render(request, "login.html", ctx)
 
 

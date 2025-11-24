@@ -20,6 +20,7 @@ class TrackOrderIntegrationTest(TestCase):
             stock=10,
             category=self.cat,
             image_url="https://example.com/arnes.jpg",
+            image="products/CAT-CAN-002_fNtjUeZ.jpg",
             sku="TI-ARN-1",
         )
 

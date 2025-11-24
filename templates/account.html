@@ -85,10 +85,22 @@
     background: #eee;
     margin: 32px 0;
   }
+
+  .text-success { color: green; }
+.text-error { color: #b71c1c; }
 </style>
 
 <div class="account-container">
   <div class="account-card">
+    {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li class="{% if message.tags == 'success' %}text-success{% else %}text-error{% endif %}">
+          {{ message }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
     <!-- Perfil -->
     <h2>Mi perfil</h2>
     <form method="post" action="{% url 'account' %}">

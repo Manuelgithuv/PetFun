@@ -19,6 +19,7 @@ class CheckoutStartIntegrationTest(TestCase):
             stock=5,
             category=self.sub,
             image_url="http://example.com/p_start.png",
+            image="products/CAT-CAN-002_fNtjUeZ.jpg",
             sku="INT-START-001",
         )
 
