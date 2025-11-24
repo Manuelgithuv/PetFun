@@ -84,3 +84,5 @@ Desktop.ini
 # Misc cache
 __pypackages__/
 .python-version
+.sonar/.sonar_lock
+.sonar/report-task.txt

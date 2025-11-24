@@ -1,4 +1,6 @@
 [run]
+source = .
+branch = True
 omit =
     */migrations/*
     */tests/*
@@ -7,3 +9,16 @@ omit =
     */wsgi.py
     */asgi.py
     */settings.py
+    */.venv/*
+    */venv/*
+    */env/*
+    manage.py
+    requirements.txt
+    templates/*
+    */.sonar/*
+plugins =
+    django_coverage_plugin
+
+[report]
+show_missing = True
+skip_empty = True
