@@ -43,7 +43,6 @@ def login_view(request):
 				return redirect(nxt)
 			return redirect("home")
 		else:
-			messages.error(request, "Email o contraseña incorrectos.")
 			error_msg = "Correo o contraseña incorrectos"
 
 	ctx = {"next": request.GET.get("next", ""),"error": error_msg}
