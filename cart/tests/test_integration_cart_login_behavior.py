@@ -34,7 +34,7 @@ class CartLoginBehaviorIntegrationTest(TestCase):
             price=Decimal("3.50"),
             stock=10,
             category=cat,
-            image_url="http://example.com/snack.png",
+            image_url="https://example.com/snack.png",
             image="products/CAT-CAN-002_fNtjUeZ.jpg",
             sku="AN-LOGIN-1",
         )

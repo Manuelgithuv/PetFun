@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "total",
-                    models.DecimalField(decimal_places=2, default=0, max_digits=10),
+                    models.DecimalField(decimal_places=2, default=0, max_digits=100),
                 ),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("updated_at", models.DateTimeField(auto_now=True)),
@@ -72,8 +72,8 @@ class Migration(migrations.Migration):
                         validators=[django.core.validators.MinValueValidator(1)]
                     ),
                 ),
-                ("unit_price", models.DecimalField(decimal_places=2, max_digits=10)),
-                ("subtotal", models.DecimalField(decimal_places=2, max_digits=10)),
+                ("unit_price", models.DecimalField(decimal_places=2, max_digits=100)),
+                ("subtotal", models.DecimalField(decimal_places=2, max_digits=100)),
                 (
                     "cart",
                     models.ForeignKey(

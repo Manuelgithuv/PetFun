@@ -18,7 +18,7 @@ class CheckoutStartIntegrationTest(TestCase):
             price=Decimal("7.50"),
             stock=5,
             category=self.sub,
-            image_url="http://example.com/p_start.png",
+            image_url="https://example.com/p_start.png",
             image="products/CAT-CAN-002_fNtjUeZ.jpg",
             sku="INT-START-001",
         )

@@ -27,7 +27,7 @@ class Order(models.Model):
 		settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="orders"
 	)
 	contact_email = models.EmailField()
-	total = models.DecimalField(max_digits=12, decimal_places=2)
+	total = models.DecimalField(max_digits=120, decimal_places=2)
 	status = models.CharField(
 		max_length=12, choices=Status.choices, default=Status.RECEIVED, db_index=True
 	)

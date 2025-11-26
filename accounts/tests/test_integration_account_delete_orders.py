@@ -14,7 +14,7 @@ class AccountDeleteOrdersIntegrationTest(TestCase):
     def setUp(self):
         self.User = get_user_model()
         self.password = "StrongPass9"
-        self.user = self.User.objects.create_user(
+        self.userTest = self.User.objects.create_user(
             email="buyer@petfun.test",
             password=self.password,
             first_name="Buyer",
@@ -37,8 +37,8 @@ class AccountDeleteOrdersIntegrationTest(TestCase):
             sku="AC-DEL-1",
         )
         self.order = Order.objects.create(
-            user=self.user,
-            contact_email=self.user.email,
+            user=self.userTest,
+            contact_email=self.userTest.email,
             total=prod.price,
             status=Order.Status.RECEIVED,
             ship_name="Buyer Test",
@@ -60,11 +60,11 @@ class AccountDeleteOrdersIntegrationTest(TestCase):
         )
 
     def test_deleting_account_does_not_delete_orders(self):
-        logged = self.client.login(email=self.user.email, password=self.password)
+        logged = self.client.login(email=self.userTest.email, password=self.password)
         self.assertTrue(logged)
         resp = self.client.post(reverse("account_delete"), data={"password": self.password}, follow=True)
         self.assertEqual(resp.status_code, 200)
-        self.assertFalse(self.User.objects.filter(email=self.user.email).exists())
+        self.assertFalse(self.User.objects.filter(email=self.userTest.email).exists())
         self.assertTrue(Order.objects.filter(pk=self.order.pk).exists())
         o = Order.objects.get(pk=self.order.pk)
         self.assertIsNone(o.user)

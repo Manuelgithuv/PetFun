@@ -80,7 +80,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('tracking_code', models.CharField(db_index=True, max_length=20, unique=True)),
                 ('contact_email', models.EmailField(max_length=254)),
-                ('total', models.DecimalField(decimal_places=2, max_digits=12)),
+                ('total', models.DecimalField(decimal_places=2, max_digits=120)),
                 ('status', models.CharField(choices=[('recibido', 'Recibido'), ('procesando', 'Procesando'), ('enviado', 'Enviado'), ('entregado', 'Entregado'), ('cancelado', 'Cancelado')], db_index=True, default='recibido', max_length=12)),
                 ('ship_name', models.CharField(max_length=150)),
                 ('ship_street', models.CharField(max_length=200)),

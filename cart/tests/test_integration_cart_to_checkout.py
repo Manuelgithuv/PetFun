@@ -34,7 +34,7 @@ class CartApiToCheckoutIntegrationTest(TestCase):
             price=Decimal("12.00"),
             stock=10,
             category=cat,
-            image_url="http://example.com/e2e.png",
+            image_url="https://example.com/e2e.png",
             image="products/CAT-CAN-002_fNtjUeZ.jpg"
         )
 
