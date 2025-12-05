@@ -130,8 +130,9 @@ Para evitar configurar variables en cada sesión, puedes usar un archivo `.env`:
 
 2) Copia el ejemplo y edítalo:
 ```powershell
-Copy-Item .env.example .env
+if (-not (Test-Path ".env")) {Copy-Item "env.example" ".env"}
 ```
+Nota: si el .env ya existe, no se sobreescribe con el env.example
 
 3) Abre `.env` y ajusta valores (por ejemplo, claves de Stripe, SMTP, etc.).
 
